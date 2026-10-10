@@ -1,0 +1,1956 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>国际象棋 · 对弈</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 45 45'%3E%3Cg fill='none' stroke='%231E4A38' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M22.5 12V6M20 8h5'/%3E%3Cpath fill='%231E4A38' d='M22.5 25s4.5-7.5 3-10.5c0 0-1-2.5-3-2.5s-3 2.5-3 2.5c-1.5 3 3 10.5 3 10.5'/%3E%3Cpath fill='%231E4A38' d='M12.5 37c5.5 3.5 14.5 3.5 20 0v-7s9-4.5 6-10.5c-4-6.5-13.5-3.5-16 4V27v-3.5c-2.5-7.5-12-10.5-16-4-3 6 6 10.5 6 10.5v7'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://miaoda.feishu.cn">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@600;700;900&display=swap">
+<style>
+  :root{
+    --bg:#E7EBE3;
+    --surface:#FCFBF6;
+    --ink:#23261F;
+    --muted:#6B7266;
+    --faint:#98A093;
+    --accent:#1E4A38;
+    --accent-2:#2E6B52;
+    --accent-ink:#EAF3EC;
+    --gold:#B48A2F;
+    --line:#D2D8CB;
+    --sq-light:#F0D9B5;
+    --sq-dark:#B58863;
+    --sq-light-ink:#B58863;
+    --sq-dark-ink:#F0D9B5;
+    --danger:#B93A32;
+    --shadow:0 10px 30px rgba(40,46,34,.12);
+    --radius:14px;
+    --glow-a:rgba(180,138,47,.10);
+    --glow-b:rgba(46,107,82,.14);
+    --eval-track:#3B342C;
+    --eval-fill:#F5F1E6;
+    --overlay:rgba(25,30,22,.55);
+    --toast-bg:var(--ink);
+    --toast-ink:#F5F1E6;
+    --badge-bg:rgba(30,74,56,.10);
+    --badge-ink:var(--accent);
+    --badge-border:rgba(30,74,56,.22);
+    --cur-bg:rgba(30,74,56,.10);
+    --tagok-bg:rgba(30,74,56,.10);
+    --tagok-ink:var(--accent);
+    --tagwarn-bg:rgba(180,138,47,.14);
+    --tagwarn-ink:#8A6A1F;
+    --tagdanger-bg:rgba(185,58,50,.12);
+    --tagdanger-ink:var(--danger);
+    --tagend-bg:var(--accent);
+    --tagend-ink:var(--accent-ink);
+    --dot-w:#F5F1E6;
+    --dot-b:#2B2B26;
+    --serif:"Noto Serif SC","Songti SC","SimSun",serif;
+    --sans:"Segoe UI","PingFang SC","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;
+  }
+  body.halloween{
+    --bg:#211537;
+    --surface:#2D1C47;
+    --ink:#F5EDFF;
+    --muted:#B7A2D6;
+    --faint:#8B74AD;
+    --accent:#F28C28;
+    --accent-2:#FFA94D;
+    --accent-ink:#331F4E;
+    --gold:#7B4FBF;
+    --line:#4B3570;
+    --sq-light:#F6B87E;
+    --sq-dark:#44296B;
+    --sq-light-ink:#3A2350;
+    --sq-dark-ink:#FFDCAE;
+    --danger:#FF6B5E;
+    --glow-a:rgba(242,140,40,.15);
+    --glow-b:rgba(123,79,191,.22);
+    --eval-track:#241636;
+    --eval-fill:#F6B87E;
+    --overlay:rgba(16,8,32,.62);
+    --toast-bg:#3A2350;
+    --toast-ink:#FFE9CE;
+    --badge-bg:rgba(242,140,40,.16);
+    --badge-ink:#F28C28;
+    --badge-border:rgba(242,140,40,.45);
+    --cur-bg:rgba(242,140,40,.18);
+    --tagok-bg:rgba(123,79,191,.24);
+    --tagok-ink:#D6B8FF;
+    --tagwarn-bg:rgba(242,140,40,.20);
+    --tagwarn-ink:#FFC07A;
+    --tagdanger-bg:rgba(255,107,94,.20);
+    --tagdanger-ink:#FF9A8A;
+    --tagend-bg:#F28C28;
+    --tagend-ink:#331F4E;
+    --dot-w:#FFE3B8;
+    --dot-b:#241636;
+  }
+  body.garden{
+    --bg:#EDE9D8;
+    --surface:#FAF7EC;
+    --ink:#3B3A2E;
+    --muted:#6C7458;
+    --faint:#98A184;
+    --accent:#4E7A43;
+    --accent-2:#7A9A63;
+    --accent-ink:#F2F7EA;
+    --gold:#C9A227;
+    --line:#CFD8BE;
+    --sq-light-ink:#4A3A20;
+    --sq-dark-ink:#F2EFDD;
+    --danger:#A0442E;
+    --glow-a:rgba(86,121,74,.14);
+    --glow-b:rgba(201,162,39,.10);
+    --eval-track:#B9BFA4;
+    --eval-fill:#4E7A43;
+    --overlay:rgba(58,56,40,.5);
+    --toast-bg:#4E7A43;
+    --toast-ink:#F2F7EA;
+    --badge-bg:rgba(78,122,67,.12);
+    --badge-ink:#4E7A43;
+    --badge-border:rgba(78,122,67,.30);
+    --cur-bg:rgba(78,122,67,.12);
+    --tagok-bg:rgba(78,122,67,.12);
+    --tagok-ink:#4E7A43;
+    --tagwarn-bg:rgba(201,162,39,.16);
+    --tagwarn-ink:#8A6D14;
+    --tagdanger-bg:rgba(160,68,46,.12);
+    --tagdanger-ink:#A0442E;
+    --tagend-bg:#4E7A43;
+    --tagend-ink:#F2F7EA;
+    --dot-w:#F4F1E6;
+    --dot-b:#3B4149;
+    /* 棋盘四季色：白方半盘(下4行)=春/秋(绿/金)，黑方半盘(上4行)=夏/冬(粉/白) */
+    --spr-light:#E7D6A4;
+    --spr-dark:#5C8A4B;
+    --sum-light:#F8DDE1;
+    --sum-dark:#D57F8E;
+    --aut-light:#F5CF5F;
+    --aut-dark:#C9961A;
+    --win-light:#F6F8FA;
+    --win-dark:#C2D0DA;
+  }
+  body.garden .g-spr-l{background-color:var(--spr-light)}
+  body.garden .g-spr-d{background-color:var(--spr-dark)}
+  body.garden .g-sum-l{background-color:var(--sum-light)}
+  body.garden .g-sum-d{background-color:var(--sum-dark)}
+  body.garden .g-aut-l{background-color:var(--aut-light)}
+  body.garden .g-aut-d{background-color:var(--aut-dark)}
+  body.garden .g-win-l{background-color:var(--win-light)}
+  body.garden .g-win-d{background-color:var(--win-dark)}
+  /* ===== 花园与骑士 · 专属 UI 主题（中世纪法兰西花园：羊皮纸 + 苔绿 + 橡木） ===== */
+  body.garden{
+    --bg:#EDE3C8; --surface:#F7F0DC; --ink:#4A3A20; --muted:#84724E; --faint:#AFA077;
+    --line:#D6C598; --accent:#5C8A4B; --accent-2:#4E7A43; --accent-ink:#F2F7EA;
+    --radius:14px; --shadow:0 12px 26px rgba(74,58,32,.14);
+    --glow-a:rgba(92,138,75,.15); --glow-b:rgba(201,162,39,.13);
+    --eval-track:#CBBE94; --eval-fill:#4E7A43;
+    --toast-bg:#5C8A4B; --toast-ink:#F2F7EA;
+    --badge-bg:rgba(92,138,75,.14); --badge-ink:#4E7A43; --badge-border:rgba(92,138,75,.32);
+    --cur-bg:rgba(92,138,75,.14);
+    --tagok-bg:rgba(92,138,75,.14); --tagok-ink:#4E7A43;
+    --tagwarn-bg:rgba(201,162,39,.18); --tagwarn-ink:#8A6D14;
+    --tagdanger-bg:rgba(160,68,46,.12); --tagdanger-ink:#A0442E;
+    --tagend-bg:#5C8A4B; --tagend-ink:#F2F7EA;
+    --overlay:rgba(58,56,40,.52);
+  }
+  body.garden header{position:relative}
+  body.garden header::after{
+    content:"";position:absolute;left:2px;right:2px;bottom:-8px;height:6px;border-radius:3px;opacity:.6;
+    background:repeating-linear-gradient(90deg,transparent 0 16px,var(--accent) 16px 21px,transparent 21px 30px,var(--gold) 30px 34px,transparent 34px 44px);
+  }
+  body.garden .title-mark{
+    background:linear-gradient(160deg,#6F9E5C,#3F6B35);border-radius:52% 52% 46% 46%;
+    box-shadow:inset 0 0 0 3px var(--gold),0 5px 12px rgba(74,58,32,.25);
+  }
+  body.garden .board-status{
+    background:linear-gradient(90deg,#F7F0DC,#FDF8EA);border-left:5px solid var(--accent);border-radius:12px;
+  }
+  body.garden #board{
+    border:7px solid #6B4A2B;border-radius:14px;
+    box-shadow:inset 0 0 0 2px var(--gold),0 16px 32px rgba(74,58,32,.22);
+  }
+  body.garden .card{box-shadow:0 3px 12px rgba(74,58,32,.08)}
+  body.garden .card h2{color:#6B5A3A}
+  body.garden .card h2::before{
+    content:"";display:inline-block;width:13px;height:13px;margin-right:6px;vertical-align:-2px;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235C8A4B' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3c4.2 3 4.2 9.6 0 12.8C7.8 12.6 7.8 6 12 3z'/%3E%3Cpath d='M12 8v7'/%3E%3C/svg%3E") center/contain no-repeat;
+  }
+  body.garden .btn{
+    background:linear-gradient(180deg,#FBF6E6,#EFE1BF);border-color:#CDBB8E;color:#5A4A28;
+    box-shadow:0 2px 0 rgba(122,98,52,.16);
+  }
+  body.garden .btn:hover{border-color:var(--accent);color:var(--accent);box-shadow:0 2px 0 rgba(122,98,52,.2)}
+  body.garden .btn.primary{
+    background:linear-gradient(180deg,#6F9E5C,#4E7A43);border-color:#3F6B35;color:var(--accent-ink);
+    box-shadow:0 2px 0 rgba(46,84,38,.32);
+  }
+  body.garden .btn.primary:hover{background:linear-gradient(180deg,#5C8A4B,#3F6B35);color:#fff}
+  body.garden .seg{background:#F2E8CE;border-color:#CDBB8E}
+  body.garden .seg button + button{border-left-color:#CDBB8E}
+  body.garden .skin-menu{border-radius:14px}
+  body.garden .foot{color:#9A8B62}
+  body.garden .lang-btn{border-color:#CDBB8E;background:linear-gradient(180deg,#FBF6E6,#EFE1BF)}
+  body.garden .lang-btn:hover{border-color:var(--accent);color:var(--accent)}
+  body.garden .lang-btn span.on{color:var(--accent);font-weight:800}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:
+      radial-gradient(1200px 600px at 85% -10%, var(--glow-a), transparent 60%),
+      radial-gradient(900px 500px at -10% 110%, var(--glow-b), transparent 60%),
+      var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:15px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  .app{max-width:1120px;margin:0 auto;padding:22px 20px 40px}
+  /* ===== 头部 ===== */
+  header{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+  .title-row{display:flex;align-items:center;gap:14px}
+  .title-mark{
+    width:46px;height:46px;border-radius:12px;background:var(--accent);
+    display:flex;align-items:center;justify-content:center;color:#fff;
+    box-shadow:var(--shadow);flex:none;
+  }
+  .title-mark svg{width:34px;height:34px}
+  h1{font-family:var(--serif);font-weight:900;font-size:30px;letter-spacing:.02em;line-height:1.15}
+  .sub{color:var(--muted);font-size:13px;margin-top:2px}
+  .header-badge{
+    font-size:12px;color:var(--badge-ink);background:var(--badge-bg);
+    border:1px solid var(--badge-border);padding:4px 12px;border-radius:999px;white-space:nowrap;
+  }
+  .skin-wrap{position:relative}
+  .skin-btn{
+    display:inline-flex;align-items:center;gap:6px;
+    font-family:var(--sans);font-size:12.5px;font-weight:700;cursor:pointer;
+    padding:6px 12px;border-radius:999px;border:1px solid var(--line);
+    background:var(--surface);color:var(--ink);
+    transition:border-color .15s,color .15s,transform .12s;
+  }
+  .skin-btn:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-1px)}
+  .skin-btn svg{width:15px;height:15px;flex:none}
+  .skin-btn svg.chev{width:10px;height:10px;margin-left:1px;opacity:.7}
+  .lang-btn{
+    display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);
+    font-size:12.5px;font-weight:700;cursor:pointer;padding:6px 12px;border-radius:999px;
+    border:1px solid var(--line);background:var(--surface);color:var(--ink);
+    transition:border-color .15s,color .15s,transform .12s;
+  }
+  .lang-btn:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-1px)}
+  .lang-btn span{opacity:.55;font-weight:600}
+  .lang-btn span.on{opacity:1;font-weight:800;color:var(--accent)}
+  .lang-btn .sep{opacity:.3}
+  .skin-menu{
+    position:absolute;top:calc(100% + 8px);right:0;min-width:162px;padding:5px;
+    background:var(--surface);border:1px solid var(--line);border-radius:12px;
+    box-shadow:var(--shadow);display:none;flex-direction:column;gap:2px;z-index:45;
+  }
+  .skin-menu.open{display:flex}
+  .skin-menu button{
+    display:flex;align-items:center;gap:9px;width:100%;padding:7px 10px;
+    border:0;background:transparent;border-radius:8px;color:var(--ink);
+    font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;text-align:left;
+    transition:background .12s,color .12s;
+  }
+  .skin-menu button:hover,.skin-menu button.active{background:var(--cur-bg);color:var(--accent)}
+  .skin-menu .dot{width:10px;height:10px;border-radius:50%;flex:none;border:1px solid var(--line)}
+  .skin-menu .c-classic{background:#B58863}
+  .skin-menu .c-halloween{background:#F28C28}
+  .skin-menu .c-garden{background:#5C8A4B}
+  /* ===== 主布局 ===== */
+  main{display:grid;grid-template-columns:minmax(0,1fr) 336px;gap:22px;align-items:start}
+  @media (max-width:960px){ main{grid-template-columns:1fr} }
+  /* ===== 棋盘区 ===== */
+  .board-col{min-width:0}
+  .board-status{
+    display:flex;align-items:center;gap:10px;margin-bottom:10px;padding:8px 14px;
+    background:var(--surface);border:1px solid var(--line);border-radius:12px;
+    box-shadow:0 2px 8px rgba(40,46,34,.06);min-height:44px;
+  }
+  .turn-dot{width:14px;height:14px;border-radius:50%;flex:none;border:2px solid rgba(0,0,0,.25)}
+  .turn-dot.w{background:var(--dot-w)}
+  .turn-dot.b{background:var(--dot-b)}
+  #statusText{font-weight:700;font-size:15px}
+  #statusSub{color:var(--muted);font-size:12.5px;margin-left:auto;text-align:right}
+  .board-wrap{display:flex;gap:10px;align-items:stretch;position:relative}
+  /* 评估条 */
+  #evalbar{
+    width:12px;flex:none;border-radius:8px;background:var(--eval-track);overflow:hidden;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
+  }
+  #evalbar .fill{
+    position:absolute;bottom:0;left:0;right:0;background:var(--eval-fill);
+    transition:height .35s ease;border-radius:8px;
+  }
+  #evalbar .track{position:relative;height:100%}
+  #board{
+    position:relative;display:grid;grid-template-columns:repeat(8,1fr);
+    width:100%;aspect-ratio:1/1;border-radius:8px;overflow:hidden;
+    box-shadow:var(--shadow);border:1px solid rgba(0,0,0,.18);
+    user-select:none;-webkit-user-select:none;touch-action:manipulation;
+  }
+  .sq{position:relative;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;cursor:pointer;background-position:center;background-size:60% auto;background-repeat:no-repeat;transition:background-color .5s ease}
+  .sq.l{background-color:var(--sq-light)}
+  .sq.d{background-color:var(--sq-dark)}
+  .sq .piece{position:relative;z-index:1;width:100%;height:100%}
+  .sq .piece svg{width:100%;height:100%;display:block;filter:drop-shadow(0 2px 2px rgba(0,0,0,.18))}
+  .sq::before,.sq::after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:2px;z-index:0}
+  .sq.last::before{background:rgba(205,195,80,.42)}
+  .sq.selected::after{background:rgba(20,85,30,.42)}
+  .sq.check::after{background:radial-gradient(circle,rgba(255,60,50,.72) 0%,rgba(231,0,0,.25) 72%)}
+  .sq.legal::after{background:rgba(0,0,0,.20);border-radius:50%;inset:34%}
+  .sq.capture::after{background:none;border:4px solid rgba(0,0,0,.28);border-radius:50%;inset:0}
+  .sq.hint-f::before{background:rgba(180,138,47,.42)}
+  .sq.hint-t::after{background:rgba(180,138,47,.40);border-radius:50%;inset:30%}
+  .sq:hover::before{background:rgba(255,255,255,.18);z-index:0}
+  .sq:not(.l):hover::before{background:rgba(255,255,255,.10)}
+  .rank-label,.file-label{
+    position:absolute;z-index:2;font-size:min(2.4vw,11px);font-weight:700;line-height:1;
+    pointer-events:none;font-family:var(--sans);
+  }
+  .rank-label{top:3px;left:4px}
+  .file-label{bottom:3px;right:4px}
+  .sq.l .rank-label,.sq.l .file-label{color:var(--sq-dark-ink)}
+  .sq.d .rank-label,.sq.d .file-label{color:var(--sq-light-ink)}
+  /* ===== 侧栏 ===== */
+  .panel{display:flex;flex-direction:column;gap:14px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;box-shadow:0 2px 8px rgba(40,46,34,.05)}
+  .card h2{font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--muted);margin-bottom:10px}
+  /* 状态卡 */
+  .status-card{display:flex;flex-direction:column;gap:12px}
+  .status-line{display:flex;align-items:center;gap:10px}
+  .status-line .big{font-family:var(--serif);font-weight:700;font-size:19px}
+  .status-line .tag{
+    font-size:12px;font-weight:700;padding:2px 10px;border-radius:999px;margin-left:auto;
+  }
+  .tag.ok{background:var(--tagok-bg);color:var(--tagok-ink)}
+  .tag.warn{background:var(--tagwarn-bg);color:var(--tagwarn-ink)}
+  .tag.danger{background:var(--tagdanger-bg);color:var(--tagdanger-ink)}
+  .tag.end{background:var(--tagend-bg);color:var(--tagend-ink)}
+  .captured{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap}
+  .cap-group{display:flex;flex-direction:column;gap:3px;min-height:20px}
+  .cap-group .cap-title{font-size:11px;color:var(--faint)}
+  .cap-group .cap-icons{display:flex;flex-wrap:wrap;gap:2px}
+  .cap-icons .mini{width:18px;height:18px;flex:none}
+  .cap-icons .mini svg{width:100%;height:100%}
+  .cap-count{font-size:11px;color:var(--faint);line-height:18px}
+  /* 按钮 */
+  .controls{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .btn{
+    font-family:var(--sans);font-size:13.5px;font-weight:600;cursor:pointer;
+    padding:9px 6px;border-radius:10px;border:1px solid var(--line);
+    background:var(--surface);color:var(--ink);transition:background .15s,border-color .15s,color .15s;
+  }
+  .btn:hover{border-color:var(--accent-2);color:var(--accent)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+  .btn.primary:hover{background:var(--accent-2);color:#fff}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  /* 走法列表 */
+  .moves-list{max-height:236px;overflow-y:auto;font-size:13.5px;column-count:2;column-gap:10px}
+  .moves-list ol{list-style:none}
+  .moves-list li{break-inside:avoid;padding:2px 6px;border-radius:6px;display:flex;gap:6px}
+  .moves-list li .no{color:var(--faint);min-width:26px;text-align:right;font-variant-numeric:tabular-nums}
+  .moves-list li .m{font-variant-numeric:tabular-nums}
+  .moves-list li.cur{background:var(--cur-bg);color:var(--accent);font-weight:600}
+  .moves-list li .pl{flex:1}
+  .empty-moves{color:var(--faint);font-size:13px;text-align:center;padding:18px 0}
+  /* 设置 */
+  .field{margin-bottom:12px}
+  .field:last-child{margin-bottom:0}
+  .field .flabel{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px;display:block}
+  .seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+  .seg button{
+    flex:1;padding:7px 4px;font-size:12.5px;font-weight:600;border:none;cursor:pointer;
+    background:transparent;color:var(--muted);font-family:var(--sans);
+  }
+  .seg button + button{border-left:1px solid var(--line)}
+  .seg button.active{background:var(--accent);color:var(--accent-ink)}
+  .seg button:disabled{opacity:.4;cursor:not-allowed}
+  .row2{display:flex;gap:8px}
+  .row2 .btn{flex:1}
+  .foot{margin-top:2px;font-size:11.5px;color:var(--faint);text-align:center}
+  .foot a{color:var(--muted)}
+  /* ===== 弹窗 ===== */
+  .modal{
+    position:fixed;inset:0;background:var(--overlay);backdrop-filter:blur(3px);
+    display:flex;align-items:center;justify-content:center;z-index:50;
+    opacity:0;pointer-events:none;transition:opacity .18s ease;
+  }
+  .modal.open{opacity:1;pointer-events:auto}
+  .modal-card{
+    background:var(--surface);border-radius:18px;box-shadow:var(--shadow);
+    padding:22px;width:min(92vw,360px);text-align:center;
+  }
+  .modal-card h3{font-family:var(--serif);font-weight:700;font-size:19px;margin-bottom:6px}
+  .modal-card p{color:var(--muted);font-size:13.5px;margin-bottom:16px}
+  .promo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .promo-btn{
+    background:var(--surface);border:1px solid var(--line);border-radius:12px;
+    padding:10px 4px;cursor:pointer;transition:border-color .15s,transform .12s;
+  }
+  .promo-btn:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .promo-btn svg{width:100%;max-height:64px;display:block}
+  .promo-btn span{display:block;font-size:11.5px;color:var(--muted);margin-top:4px}
+  .end-actions{display:flex;gap:10px;justify-content:center}
+  .end-actions .btn{padding:9px 18px}
+  /* ===== Toast ===== */
+  #toast{
+    position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(16px);
+    background:var(--toast-bg);color:var(--toast-ink);font-size:13.5px;font-weight:600;
+    padding:10px 18px;border-radius:999px;opacity:0;pointer-events:none;
+    transition:opacity .22s ease,transform .22s ease;z-index:60;box-shadow:var(--shadow);
+    max-width:86vw;text-align:center;
+  }
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .thinking-dots::after{content:"…";animation:dots 1.2s steps(4,end) infinite}
+  @keyframes dots{0%{content:""}25%{content:"."}50%{content:".."}75%{content:"..."}}
+  @media (max-width:520px){
+    .app{padding:14px 12px 30px}
+    h1{font-size:24px}
+    .title-mark{width:38px;height:38px}
+    .title-mark svg{width:28px;height:28px}
+    .board-status{padding:7px 12px}
+    #statusText{font-size:13.5px}
+    .moves-list{column-count:1;max-height:200px}
+    .status-line .big{font-size:17px}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div class="title-row">
+      <div class="title-mark" aria-hidden="true">
+        <svg viewBox="0 0 45 45"><g fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"><path d="M22.5 12V6M20 8h5"/><path fill="#fff" d="M22.5 25s4.5-7.5 3-10.5c0 0-1-2.5-3-2.5s-3 2.5-3 2.5c-1.5 3 3 10.5 3 10.5"/><path fill="#fff" d="M12.5 37c5.5 3.5 14.5 3.5 20 0v-7s9-4.5 6-10.5c-4-6.5-13.5-3.5-16 4V27v-3.5c-2.5-7.5-12-10.5-16-4-3 6 6 10.5 6 10.5v7"/></g></svg>
+      </div>
+      <div>
+        <h1 data-i18n="title">国际象棋</h1>
+        <div class="sub" data-i18n="subtitle">人机对弈 · 双人对弈 · 完整规则</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span class="header-badge" id="modeBadge">人机对弈 · 中等</span>
+      <button class="lang-btn" id="btnLang" title="中文 / English">
+        <span data-l="zh">中</span><span class="sep">/</span><span data-l="en">EN</span>
+      </button>
+      <div class="skin-wrap">
+        <button class="skin-btn" id="btnSkin" data-i18n-title="pickSkin" title="选择皮肤">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z"/><path d="M3 12h18M12 3c2.5 2.4 3.8 5.6 3.8 9S14.5 18.6 12 21c-2.5-2.4-3.8-5.6-3.8-9S9.5 5.4 12 3z"/></svg>
+          <span id="skinLabel">经典</span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="skin-menu" id="skinMenu">
+          <button data-skin="classic" data-i18n="skinClassic"><span class="dot c-classic"></span>经典</button>
+          <button data-skin="halloween" data-i18n="skinHalloween"><span class="dot c-halloween"></span>万圣节</button>
+          <button data-skin="garden" data-i18n="skinGarden"><span class="dot c-garden"></span>花园与骑士</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ===== 棋盘列 ===== -->
+    <section class="board-col">
+      <div class="board-status">
+        <span class="turn-dot w" id="turnDot"></span>
+        <span id="statusText">白方走棋</span>
+        <span id="statusSub"></span>
+      </div>
+      <div class="board-wrap">
+        <div id="evalbar" data-i18n-title="evalTitle" title="局面评估"><div class="track"><div class="fill" id="evalFill"></div></div></div>
+        <div id="board" role="grid" data-i18n-aria="boardAria" aria-label="棋盘"></div>
+      </div>
+    </section>
+
+    <!-- ===== 侧栏 ===== -->
+    <aside class="panel">
+      <div class="card status-card">
+        <div class="status-line">
+          <span class="turn-dot w" id="turnDot2"></span>
+          <span class="big" id="bigStatus">对局开始</span>
+          <span class="tag ok" id="statusTag">进行中</span>
+        </div>
+        <div class="captured" id="capturedRow"></div>
+      </div>
+
+      <div class="card">
+        <h2 data-i18n="opsTitle">操作</h2>
+        <div class="controls">
+          <button class="btn" id="btnUndo" data-i18n="undo" data-i18n-title="undoTitle" title="撤销一步">悔棋</button>
+          <button class="btn" id="btnNew" data-i18n="newGameBtn">新对局</button>
+          <button class="btn" id="btnFlip" data-i18n="flipBtn" data-i18n-title="flipTitle" title="翻转棋盘">翻转</button>
+        </div>
+        <div class="row2" style="margin-top:8px">
+          <button class="btn" id="btnHint" data-i18n="hintBtn" data-i18n-title="hintTitle" title="让 AI 提示一步好棋">提示</button>
+          <button class="btn" id="btnSound">音效：开</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 data-i18n="movesTitle">走法记录</h2>
+        <div class="moves-list" id="movesList"></div>
+      </div>
+
+      <div class="card">
+        <h2 data-i18n="settingsTitle">对局设置</h2>
+        <div class="field">
+          <span class="flabel" data-i18n="modeLabel">模式</span>
+          <div class="seg" id="segMode">
+            <button data-mode="ai" data-i18n="modeAi" class="active">人机对弈</button>
+            <button data-mode="pvp" data-i18n="modePvp">双人对弈</button>
+          </div>
+        </div>
+        <div class="field">
+          <span class="flabel" data-i18n="diffLabel">难度</span>
+          <div class="seg" id="segDiff">
+            <button data-diff="easy" data-i18n="diffEasy">简单</button>
+            <button data-diff="mid" data-i18n="diffMid" class="active">中等</button>
+            <button data-diff="hard" data-i18n="diffHard">困难</button>
+          </div>
+        </div>
+        <div class="field" id="fieldSide">
+          <span class="flabel" data-i18n="sideLabel">我执</span>
+          <div class="seg" id="segSide">
+            <button data-side="w" data-i18n="sideW" class="active">白（先手）</button>
+            <button data-side="b" data-i18n="sideB">黑（后手）</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="foot"><span data-i18n="foot1">经典棋子图形：Cburnett · </span><a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a><span data-i18n="foot2">（Wikimedia Commons）；万圣节 / 花园与骑士皮肤棋子为原创卡通设计</span></div>
+    </aside>
+  </main>
+</div>
+
+<!-- ===== 升变弹窗 ===== -->
+<div class="modal" id="promoModal">
+  <div class="modal-card">
+    <h3 data-i18n="promoTitle">兵升变</h3>
+    <p data-i18n="promoDesc">选择要升变成为的棋子</p>
+    <div class="promo-grid" id="promoGrid"></div>
+  </div>
+</div>
+
+<!-- ===== 对局结束弹窗 ===== -->
+<div class="modal" id="endModal">
+  <div class="modal-card">
+    <h3 id="endTitle">对局结束</h3>
+    <p id="endDesc"></p>
+    <div class="end-actions">
+      <button class="btn primary" id="btnRematch" data-i18n="rematchBtn">再来一局</button>
+      <button class="btn" id="btnCloseEnd" data-i18n="viewBoardBtn">查看棋盘</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const PIECE_SVG = {
+  "KW": "<g fill=\"none\" fill-rule=\"evenodd\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\">\n    <path stroke-linejoin=\"miter\" d=\"M22.5 11.63V6M20 8h5\"/>\n    <path fill=\"#fff\" stroke-linecap=\"butt\" stroke-linejoin=\"miter\" d=\"M22.5 25s4.5-7.5 3-10.5c0 0-1-2.5-3-2.5s-3 2.5-3 2.5c-1.5 3 3 10.5 3 10.5\"/>\n    <path fill=\"#fff\" d=\"M12.5 37c5.5 3.5 14.5 3.5 20 0v-7s9-4.5 6-10.5c-4-6.5-13.5-3.5-16 4V27v-3.5c-2.5-7.5-12-10.5-16-4-3 6 6 10.5 6 10.5v7\"/>\n    <path d=\"M12.5 30c5.5-3 14.5-3 20 0m-20 3.5c5.5-3 14.5-3 20 0m-20 3.5c5.5-3 14.5-3 20 0\"/>\n  </g>",
+  "QW": "<g style=\"fill:#ffffff;stroke:#000000;stroke-width:1.5;stroke-linejoin:round\">\n    <path d=\"M 9,26 C 17.5,24.5 30,24.5 36,26 L 38.5,13.5 L 31,25 L 30.7,10.9 L 25.5,24.5 L 22.5,10 L 19.5,24.5 L 14.3,10.9 L 14,25 L 6.5,13.5 L 9,26 z\"/>\n    <path d=\"M 9,26 C 9,28 10.5,28 11.5,30 C 12.5,31.5 12.5,31 12,33.5 C 10.5,34.5 11,36 11,36 C 9.5,37.5 11,38.5 11,38.5 C 17.5,39.5 27.5,39.5 34,38.5 C 34,38.5 35.5,37.5 34,36 C 34,36 34.5,34.5 33,33.5 C 32.5,31 32.5,31.5 33.5,30 C 34.5,28 36,28 36,26 C 27.5,24.5 17.5,24.5 9,26 z\"/>\n    <path d=\"M 11.5,30 C 15,29 30,29 33.5,30\" style=\"fill:none\"/>\n    <path d=\"M 12,33.5 C 18,32.5 27,32.5 33,33.5\" style=\"fill:none\"/>\n    <circle cx=\"6\" cy=\"12\" r=\"2\" />\n    <circle cx=\"14\" cy=\"9\" r=\"2\" />\n    <circle cx=\"22.5\" cy=\"8\" r=\"2\" />\n    <circle cx=\"31\" cy=\"9\" r=\"2\" />\n    <circle cx=\"39\" cy=\"12\" r=\"2\" />\n  </g>",
+  "RW": "<g style=\"opacity:1; fill:#ffffff; fill-opacity:1; fill-rule:evenodd; stroke:#000000; stroke-width:1.5; stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4; stroke-dasharray:none; stroke-opacity:1;\" transform=\"translate(0,0.3)\">\n    <path\n      d=\"M 9,39 L 36,39 L 36,36 L 9,36 L 9,39 z \"\n      style=\"stroke-linecap:butt;\" />\n    <path\n      d=\"M 12,36 L 12,32 L 33,32 L 33,36 L 12,36 z \"\n      style=\"stroke-linecap:butt;\" />\n    <path\n      d=\"M 11,14 L 11,9 L 15,9 L 15,11 L 20,11 L 20,9 L 25,9 L 25,11 L 30,11 L 30,9 L 34,9 L 34,14\"\n      style=\"stroke-linecap:butt;\" />\n    <path\n      d=\"M 34,14 L 31,17 L 14,17 L 11,14\" />\n    <path\n      d=\"M 31,17 L 31,29.5 L 14,29.5 L 14,17\"\n      style=\"stroke-linecap:butt; stroke-linejoin:miter;\" />\n    <path\n      d=\"M 31,29.5 L 32.5,32 L 12.5,32 L 14,29.5\" />\n    <path\n      d=\"M 11,14 L 34,14\"\n      style=\"fill:none; stroke:#000000; stroke-linejoin:miter;\" />\n  </g>",
+  "BW": "<g style=\"opacity:1; fill:none; fill-rule:evenodd; fill-opacity:1; stroke:#000000; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; stroke-miterlimit:4; stroke-dasharray:none; stroke-opacity:1;\" transform=\"translate(0,0.6)\">\n    <g style=\"fill:#ffffff; stroke:#000000; stroke-linecap:butt;\">\n      <path d=\"M 9,36 C 12.39,35.03 19.11,36.43 22.5,34 C 25.89,36.43 32.61,35.03 36,36 C 36,36 37.65,36.54 39,38 C 38.32,38.97 37.35,38.99 36,38.5 C 32.61,37.53 25.89,38.96 22.5,37.5 C 19.11,38.96 12.39,37.53 9,38.5 C 7.65,38.99 6.68,38.97 6,38 C 7.35,36.54 9,36 9,36 z\"/>\n      <path d=\"M 15,32 C 17.5,34.5 27.5,34.5 30,32 C 30.5,30.5 30,30 30,30 C 30,27.5 27.5,26 27.5,26 C 33,24.5 33.5,14.5 22.5,10.5 C 11.5,14.5 12,24.5 17.5,26 C 17.5,26 15,27.5 15,30 C 15,30 14.5,30.5 15,32 z\"/>\n      <path d=\"M 25 8 A 2.5 2.5 0 1 1  20,8 A 2.5 2.5 0 1 1  25 8 z\"/>\n    </g>\n    <path d=\"M 17.5,26 L 27.5,26 M 15,30 L 30,30 M 22.5,15.5 L 22.5,20.5 M 20,18 L 25,18\" style=\"fill:none; stroke:#000000; stroke-linejoin:miter;\"/>\n  </g>",
+  "NW": "<g style=\"opacity:1; fill:none; fill-opacity:1; fill-rule:evenodd; stroke:#000000; stroke-width:1.5; stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4; stroke-dasharray:none; stroke-opacity:1;\" transform=\"translate(0,0.3)\">\n    <path\n      d=\"M 22,10 C 32.5,11 38.5,18 38,39 L 15,39 C 15,30 25,32.5 23,18\"\n      style=\"fill:#ffffff; stroke:#000000;\" />\n    <path\n      d=\"M 24,18 C 24.38,20.91 18.45,25.37 16,27 C 13,29 13.18,31.34 11,31 C 9.958,30.06 12.41,27.96 11,28 C 10,28 11.19,29.23 10,30 C 9,30 5.997,31 6,26 C 6,24 12,14 12,14 C 12,14 13.89,12.1 14,10.5 C 13.27,9.506 13.5,8.5 13.5,7.5 C 14.5,6.5 16.5,10 16.5,10 L 18.5,10 C 18.5,10 19.28,8.008 21,7 C 22,7 22,10 22,10\"\n      style=\"fill:#ffffff; stroke:#000000;\" />\n    <path\n      d=\"M 9.5 25.5 A 0.5 0.5 0 1 1 8.5,25.5 A 0.5 0.5 0 1 1 9.5 25.5 z\"\n      style=\"fill:#000000; stroke:#000000;\" />\n    <path\n      d=\"M 15 15.5 A 0.5 1.5 0 1 1  14,15.5 A 0.5 1.5 0 1 1  15 15.5 z\"\n      transform=\"matrix(0.866,0.5,-0.5,0.866,9.693,-5.173)\"\n      style=\"fill:#000000; stroke:#000000;\" />\n  </g>",
+  "PW": "<path d=\"m 22.5,9 c -2.21,0 -4,1.79 -4,4 0,0.89 0.29,1.71 0.78,2.38 C 17.33,16.5 16,18.59 16,21 c 0,2.03 0.94,3.84 2.41,5.03 C 15.41,27.09 11,31.58 11,39.5 H 34 C 34,31.58 29.59,27.09 26.59,26.03 28.06,24.84 29,23.03 29,21 29,18.59 27.67,16.5 25.72,15.38 26.21,14.71 26.5,13.89 26.5,13 c 0,-2.21 -1.79,-4 -4,-4 z\" style=\"opacity:1; fill:#ffffff; fill-opacity:1; fill-rule:nonzero; stroke:#000000; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:miter; stroke-miterlimit:4; stroke-dasharray:none; stroke-opacity:1;\"/>",
+  "KB": "<g style=\"fill:none; fill-opacity:1; fill-rule:evenodd; stroke:#000000; stroke-width:1.5; stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4; stroke-dasharray:none; stroke-opacity:1;\">\n    <path d=\"M 22.5,11.63 L 22.5,6\" style=\"fill:none; stroke:#000000; stroke-linejoin:miter;\" id=\"path6570\"/>\n    <path d=\"M 22.5,25 C 22.5,25 27,17.5 25.5,14.5 C 25.5,14.5 24.5,12 22.5,12 C 20.5,12 19.5,14.5 19.5,14.5 C 18,17.5 22.5,25 22.5,25\" style=\"fill:#000000;fill-opacity:1; stroke-linecap:butt; stroke-linejoin:miter;\"/>\n    <path d=\"M 12.5,37 C 18,40.5 27,40.5 32.5,37 L 32.5,30 C 32.5,30 41.5,25.5 38.5,19.5 C 34.5,13 25,16 22.5,23.5 L 22.5,27 L 22.5,23.5 C 20,16 10.5,13 6.5,19.5 C 3.5,25.5 12.5,30 12.5,30 L 12.5,37\" style=\"fill:#000000; stroke:#000000;\"/>\n    <path d=\"M 20,8 L 25,8\" style=\"fill:none; stroke:#000000; stroke-linejoin:miter;\"/>\n    <path d=\"M 32,29.5 C 32,29.5 40.5,25.5 38.03,19.85 C 34.15,14 25,18 22.5,24.5 L 22.5,26.6 L 22.5,24.5 C 20,18 10.85,14 6.97,19.85 C 4.5,25.5 13,29.5 13,29.5\" style=\"fill:none; stroke:#ffffff;\"/>\n    <path d=\"M 12.5,30 C 18,27 27,27 32.5,30 M 12.5,33.5 C 18,30.5 27,30.5 32.5,33.5 M 12.5,37 C 18,34 27,34 32.5,37\" style=\"fill:none; stroke:#ffffff;\"/>\n  </g>",
+  "QB": "<g style=\"fill:#000000;stroke:#000000;stroke-width:1.5; stroke-linecap:round;stroke-linejoin:round\">\n\n    <path d=\"M 9,26 C 17.5,24.5 30,24.5 36,26 L 38.5,13.5 L 31,25 L 30.7,10.9 L 25.5,24.5 L 22.5,10 L 19.5,24.5 L 14.3,10.9 L 14,25 L 6.5,13.5 L 9,26 z\"\n    style=\"stroke-linecap:butt;fill:#000000\" />\n    <path d=\"m 9,26 c 0,2 1.5,2 2.5,4 1,1.5 1,1 0.5,3.5 -1.5,1 -1,2.5 -1,2.5 -1.5,1.5 0,2.5 0,2.5 6.5,1 16.5,1 23,0 0,0 1.5,-1 0,-2.5 0,0 0.5,-1.5 -1,-2.5 -0.5,-2.5 -0.5,-2 0.5,-3.5 1,-2 2.5,-2 2.5,-4 -8.5,-1.5 -18.5,-1.5 -27,0 z\" />\n    <path d=\"M 11.5,30 C 15,29 30,29 33.5,30\" />\n    <path d=\"m 12,33.5 c 6,-1 15,-1 21,0\" />\n    <circle cx=\"6\" cy=\"12\" r=\"2\" />\n    <circle cx=\"14\" cy=\"9\" r=\"2\" />\n    <circle cx=\"22.5\" cy=\"8\" r=\"2\" />\n    <circle cx=\"31\" cy=\"9\" r=\"2\" />\n    <circle cx=\"39\" cy=\"12\" r=\"2\" />\n    <path d=\"M 11,38.5 A 35,35 1 0 0 34,38.5\"\n    style=\"fill:none; stroke:#000000;stroke-linecap:butt;\" />\n    <g style=\"fill:none; stroke:#ffffff;\">\n      <path d=\"M 11,29 A 35,35 1 0 1 34,29\" />\n      <path d=\"M 12.5,31.5 L 32.5,31.5\" />\n      <path d=\"M 11.5,34.5 A 35,35 1 0 0 33.5,34.5\" />\n      <path d=\"M 10.5,37.5 A 35,35 1 0 0 34.5,37.5\" />\n    </g>\n  </g>",
+  "RB": "<g style=\"opacity:1; fill:#000000; fill-opacity:1; fill-rule:evenodd; stroke:#000000; stroke-width:1.5; stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4; stroke-dasharray:none; stroke-opacity:1;\" transform=\"translate(0,0.3)\">\n    <path\n      d=\"M 9,39 L 36,39 L 36,36 L 9,36 L 9,39 z \"\n      style=\"stroke-linecap:butt;\" />\n    <path\n      d=\"M 12.5,32 L 14,29.5 L 31,29.5 L 32.5,32 L 12.5,32 z \"\n      style=\"stroke-linecap:butt;\" />\n    <path\n      d=\"M 12,36 L 12,32 L 33,32 L 33,36 L 12,36 z \"\n      style=\"stroke-linecap:butt;\" />\n    <path\n      d=\"M 14,29.5 L 14,16.5 L 31,16.5 L 31,29.5 L 14,29.5 z \"\n      style=\"stroke-linecap:butt;stroke-linejoin:miter;\" />\n    <path\n      d=\"M 14,16.5 L 11,14 L 34,14 L 31,16.5 L 14,16.5 z \"\n      style=\"stroke-linecap:butt;\" />\n    <path\n      d=\"M 11,14 L 11,9 L 15,9 L 15,11 L 20,11 L 20,9 L 25,9 L 25,11 L 30,11 L 30,9 L 34,9 L 34,14 L 11,14 z \"\n      style=\"stroke-linecap:butt;\" />\n    <path\n      d=\"M 12,35.5 L 33,35.5 L 33,35.5\"\n      style=\"fill:none; stroke:#ffffff; stroke-width:1; stroke-linejoin:miter;\" />\n    <path\n      d=\"M 13,31.5 L 32,31.5\"\n      style=\"fill:none; stroke:#ffffff; stroke-width:1; stroke-linejoin:miter;\" />\n    <path\n      d=\"M 14,29.5 L 31,29.5\"\n      style=\"fill:none; stroke:#ffffff; stroke-width:1; stroke-linejoin:miter;\" />\n    <path\n      d=\"M 14,16.5 L 31,16.5\"\n      style=\"fill:none; stroke:#ffffff; stroke-width:1; stroke-linejoin:miter;\" />\n    <path\n      d=\"M 11,14 L 34,14\"\n      style=\"fill:none; stroke:#ffffff; stroke-width:1; stroke-linejoin:miter;\" />\n  </g>",
+  "BB": "<g style=\"opacity:1; fill:none; fill-rule:evenodd; fill-opacity:1; stroke:#000000; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; stroke-miterlimit:4; stroke-dasharray:none; stroke-opacity:1;\" transform=\"translate(0,0.6)\">\n    <g style=\"fill:#000000; stroke:#000000; stroke-linecap:butt;\">\n      <path d=\"M 9,36 C 12.39,35.03 19.11,36.43 22.5,34 C 25.89,36.43 32.61,35.03 36,36 C 36,36 37.65,36.54 39,38 C 38.32,38.97 37.35,38.99 36,38.5 C 32.61,37.53 25.89,38.96 22.5,37.5 C 19.11,38.96 12.39,37.53 9,38.5 C 7.65,38.99 6.68,38.97 6,38 C 7.35,36.54 9,36 9,36 z\"/>\n      <path d=\"M 15,32 C 17.5,34.5 27.5,34.5 30,32 C 30.5,30.5 30,30 30,30 C 30,27.5 27.5,26 27.5,26 C 33,24.5 33.5,14.5 22.5,10.5 C 11.5,14.5 12,24.5 17.5,26 C 17.5,26 15,27.5 15,30 C 15,30 14.5,30.5 15,32 z\"/>\n      <path d=\"M 25 8 A 2.5 2.5 0 1 1  20,8 A 2.5 2.5 0 1 1  25 8 z\"/>\n    </g>\n    <path d=\"M 17.5,26 L 27.5,26 M 15,30 L 30,30 M 22.5,15.5 L 22.5,20.5 M 20,18 L 25,18\" style=\"fill:none; stroke:#ffffff; stroke-linejoin:miter;\"/>\n  </g>",
+  "NB": "<g style=\"opacity:1; fill:none; fill-opacity:1; fill-rule:evenodd; stroke:#000000; stroke-width:1.5; stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4; stroke-dasharray:none; stroke-opacity:1;\" transform=\"translate(0,0.3)\">\n    <path\n      d=\"M 22,10 C 32.5,11 38.5,18 38,39 L 15,39 C 15,30 25,32.5 23,18\"\n      style=\"fill:#000000; stroke:#000000;\" />\n    <path\n      d=\"M 24,18 C 24.38,20.91 18.45,25.37 16,27 C 13,29 13.18,31.34 11,31 C 9.958,30.06 12.41,27.96 11,28 C 10,28 11.19,29.23 10,30 C 9,30 5.997,31 6,26 C 6,24 12,14 12,14 C 12,14 13.89,12.1 14,10.5 C 13.27,9.506 13.5,8.5 13.5,7.5 C 14.5,6.5 16.5,10 16.5,10 L 18.5,10 C 18.5,10 19.28,8.008 21,7 C 22,7 22,10 22,10\"\n      style=\"fill:#000000; stroke:#000000;\" />\n    <path\n      d=\"M 9.5 25.5 A 0.5 0.5 0 1 1 8.5,25.5 A 0.5 0.5 0 1 1 9.5 25.5 z\"\n      style=\"fill:#ffffff; stroke:#ffffff;\" />\n    <path\n      d=\"M 15 15.5 A 0.5 1.5 0 1 1  14,15.5 A 0.5 1.5 0 1 1  15 15.5 z\"\n      transform=\"matrix(0.866,0.5,-0.5,0.866,9.693,-5.173)\"\n      style=\"fill:#ffffff; stroke:#ffffff;\" />\n    <path\n      d=\"M 24.55,10.4 L 24.1,11.85 L 24.6,12 C 27.75,13 30.25,14.49 32.5,18.75 C 34.75,23.01 35.75,29.06 35.25,39 L 35.2,39.5 L 37.45,39.5 L 37.5,39 C 38,28.94 36.62,22.15 34.25,17.66 C 31.88,13.17 28.46,11.02 25.06,10.5 L 24.55,10.4 z \"\n      style=\"fill:#ffffff; stroke:none;\" />\n  </g>",
+  "PB": "<path d=\"m 22.5,9 c -2.21,0 -4,1.79 -4,4 0,0.89 0.29,1.71 0.78,2.38 C 17.33,16.5 16,18.59 16,21 c 0,2.03 0.94,3.84 2.41,5.03 C 15.41,27.09 11,31.58 11,39.5 H 34 C 34,31.58 29.59,27.09 26.59,26.03 28.06,24.84 29,23.03 29,21 29,18.59 27.67,16.5 25.72,15.38 26.21,14.71 26.5,13.89 26.5,13 c 0,-2.21 -1.79,-4 -4,-4 z\" style=\"opacity:1; fill:#000000; fill-opacity:1; fill-rule:nonzero; stroke:#000000; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:miter; stroke-miterlimit:4; stroke-dasharray:none; stroke-opacity:1;\"/>",
+};
+/* ===================== 棋局引擎 ===================== */
+const FILES = 'abcdefgh';
+const EMPTY = null;
+const MATE = 100000;
+const KNIGHT_STEPS = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
+const BISHOP_DIRS = [[-1,-1],[-1,1],[1,-1],[1,1]];
+const ROOK_DIRS = [[-1,0],[1,0],[0,-1],[0,1]];
+const QUEEN_DIRS = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+const KING_STEPS = QUEEN_DIRS;
+const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+
+function sqIdx(r, f){ return r * 8 + f; }
+function fileOf(i){ return i & 7; }
+function rankOf(i){ return i >> 3; }
+function sqName(i){ return FILES[fileOf(i)] + (8 - rankOf(i)); }
+function parseSq(s){ return sqIdx(8 - Number(s[1]), FILES.indexOf(s[0])); }
+function pieceColor(p){ return (p >= 'a' && p <= 'z') ? 'b' : 'w'; }
+function isWhite(p){ return p && p >= 'A' && p <= 'Z'; }
+
+function fenToState(fen){
+  const parts = fen.split(' ');
+  const rows = parts[0].split('/');
+  const board = new Array(64).fill(EMPTY);
+  for (let r = 0; r < 8; r++){
+    let f = 0;
+    for (const ch of rows[r]){
+      if (ch >= '1' && ch <= '8'){ f += Number(ch); }
+      else { board[sqIdx(r, f)] = ch; f++; }
+    }
+  }
+  return {
+    board,
+    turn: parts[1],
+    castling: { K: parts[2].includes('K'), Q: parts[2].includes('Q'), k: parts[2].includes('k'), q: parts[2].includes('q') },
+    ep: parts[3] === '-' ? -1 : parseSq(parts[3]),
+    halfmove: Number(parts[4]),
+    fullmove: Number(parts[5])
+  };
+}
+function stateToFen(s){
+  const rows = [];
+  for (let r = 0; r < 8; r++){
+    let row = '', empty = 0;
+    for (let f = 0; f < 8; f++){
+      const p = s.board[sqIdx(r, f)];
+      if (!p) empty++;
+      else { if (empty){ row += empty; empty = 0; } row += p; }
+    }
+    if (empty) row += empty;
+    rows.push(row);
+  }
+  const c = (s.castling.K?'K':'') + (s.castling.Q?'Q':'') + (s.castling.k?'k':'') + (s.castling.q?'q':'') || '-';
+  const ep = s.ep >= 0 ? sqName(s.ep) : '-';
+  return rows.join('/') + ' ' + s.turn + ' ' + c + ' ' + ep + ' ' + s.halfmove + ' ' + s.fullmove;
+}
+function posKey(s){
+  return s.board.join('') + '|' + s.turn + '|' +
+    (s.castling.K?'K':'') + (s.castling.Q?'Q':'') + (s.castling.k?'k':'') + (s.castling.q?'q':'') + '|' + s.ep;
+}
+
+function makeMove(s, mv){
+  const b = s.board;
+  const p = b[mv.from];
+  const pc = pieceColor(p);
+  const undo = {
+    captured: null, capSq: -1,
+    castle: { K: s.castling.K, Q: s.castling.Q, k: s.castling.k, q: s.castling.q },
+    ep: s.ep, half: s.halfmove, rook: null
+  };
+  let captured = null, capSq = -1;
+  if (mv.flags === 'ep'){
+    capSq = sqIdx(rankOf(mv.from), fileOf(mv.to));
+    captured = b[capSq];
+    b[capSq] = EMPTY;
+  } else {
+    captured = b[mv.to];
+    if (captured){ capSq = mv.to; }
+  }
+  undo.captured = captured; undo.capSq = capSq;
+  b[mv.to] = p;
+  b[mv.from] = EMPTY;
+  if (mv.flags === 'k'){
+    const home = pc === 'w' ? 7 : 0;
+    undo.rook = { from: sqIdx(home, 7), to: sqIdx(home, 5) };
+    b[undo.rook.to] = b[undo.rook.from]; b[undo.rook.from] = EMPTY;
+  } else if (mv.flags === 'q'){
+    const home = pc === 'w' ? 7 : 0;
+    undo.rook = { from: sqIdx(home, 0), to: sqIdx(home, 3) };
+    b[undo.rook.to] = b[undo.rook.from]; b[undo.rook.from] = EMPTY;
+  }
+  if (mv.promo) b[mv.to] = pc === 'w' ? mv.promo : mv.promo.toLowerCase();
+  // castling rights
+  if (p === 'K'){ s.castling.K = false; s.castling.Q = false; }
+  if (p === 'k'){ s.castling.k = false; s.castling.q = false; }
+  if (p === 'R' && mv.from === 63) s.castling.K = false;
+  if (p === 'R' && mv.from === 56) s.castling.Q = false;
+  if (p === 'r' && mv.from === 7) s.castling.k = false;
+  if (p === 'r' && mv.from === 0) s.castling.q = false;
+  if (mv.to === 63) s.castling.K = false;
+  if (mv.to === 56) s.castling.Q = false;
+  if (mv.to === 7) s.castling.k = false;
+  if (mv.to === 0) s.castling.q = false;
+  // en passant
+  const ut = p.toUpperCase();
+  if (ut === 'P' && Math.abs(rankOf(mv.to) - rankOf(mv.from)) === 2){
+    s.ep = sqIdx((rankOf(mv.from) + rankOf(mv.to)) >> 1, fileOf(mv.from));
+  } else s.ep = -1;
+  s.halfmove = (ut === 'P' || captured) ? 0 : s.halfmove + 1;
+  if (pc === 'b') s.fullmove++;
+  s.turn = pc === 'w' ? 'b' : 'w';
+  return undo;
+}
+function unmakeMove(s, mv, undo){
+  const b = s.board;
+  const mover = s.turn === 'w' ? 'b' : 'w';
+  const pc = mover;
+  const p = b[mv.to];
+  b[mv.from] = p;
+  if (mv.promo) b[mv.from] = pc === 'w' ? 'P' : 'p';
+  if (undo.rook){
+    b[undo.rook.from] = b[undo.rook.to];
+    b[undo.rook.to] = EMPTY;
+  }
+  if (mv.flags === 'ep'){
+    b[mv.to] = EMPTY;
+    if (undo.captured) b[undo.capSq] = undo.captured;
+  } else {
+    b[mv.to] = undo.captured || EMPTY;
+  }
+  s.castling.K = undo.castle.K; s.castling.Q = undo.castle.Q;
+  s.castling.k = undo.castle.k; s.castling.q = undo.castle.q;
+  s.ep = undo.ep; s.halfmove = undo.half;
+  if (pc === 'b') s.fullmove--;
+  s.turn = mover;
+}
+
+function isAttacked(s, sq, byColor){
+  const b = s.board;
+  const r = rankOf(sq), f = fileOf(sq);
+  // pawns
+  const pdir = byColor === 'w' ? 1 : -1;
+  for (const df of [-1, 1]){
+    const nr = r + pdir, nf = f + df;
+    if (nr >= 0 && nr < 8 && nf >= 0 && nf < 8){
+      const t = b[sqIdx(nr, nf)];
+      if (t && pieceColor(t) === byColor && t.toUpperCase() === 'P') return true;
+    }
+  }
+  // knights
+  for (const [df, dr] of KNIGHT_STEPS){
+    const nr = r + dr, nf = f + df;
+    if (nr >= 0 && nr < 8 && nf >= 0 && nf < 8){
+      const t = b[sqIdx(nr, nf)];
+      if (t && pieceColor(t) === byColor && t.toUpperCase() === 'N') return true;
+    }
+  }
+  // king
+  for (const [df, dr] of KING_STEPS){
+    const nr = r + dr, nf = f + df;
+    if (nr >= 0 && nr < 8 && nf >= 0 && nf < 8){
+      const t = b[sqIdx(nr, nf)];
+      if (t && pieceColor(t) === byColor && t.toUpperCase() === 'K') return true;
+    }
+  }
+  // sliders
+  for (const [df, dr] of QUEEN_DIRS){
+    let nr = r + dr, nf = f + df;
+    while (nr >= 0 && nr < 8 && nf >= 0 && nf < 8){
+      const t = b[sqIdx(nr, nf)];
+      if (t){
+        if (pieceColor(t) === byColor){
+          const tu = t.toUpperCase();
+          const isD = (df !== 0 && dr !== 0);
+          if ((isD && (tu === 'B' || tu === 'Q')) || (!isD && (tu === 'R' || tu === 'Q'))) return true;
+        }
+        break;
+      }
+      nr += dr; nf += df;
+    }
+  }
+  return false;
+}
+function findKing(s, color){
+  for (let i = 0; i < 64; i++){
+    const p = s.board[i];
+    if (p && pieceColor(p) === color && p.toUpperCase() === 'K') return i;
+  }
+  return -1;
+}
+function inCheck(s, color){
+  const k = findKing(s, color);
+  if (k < 0) return true;
+  return isAttacked(s, k, color === 'w' ? 'b' : 'w');
+}
+
+function castleMoves(s, i){
+  const moves = [];
+  const us = s.turn, them = us === 'w' ? 'b' : 'w';
+  const home = us === 'w' ? 7 : 0;
+  if (us === 'w' && i !== 60) return moves;
+  if (us === 'b' && i !== 4) return moves;
+  const KR = us === 'w' ? 'R' : 'r';
+  if (us === 'w' ? s.castling.K : s.castling.k){
+    if (!s.board[sqIdx(home, 5)] && !s.board[sqIdx(home, 6)] && s.board[sqIdx(home, 7)] === KR &&
+        !isAttacked(s, i, them) && !isAttacked(s, sqIdx(home, 5), them) && !isAttacked(s, sqIdx(home, 6), them)){
+      moves.push({ from: i, to: sqIdx(home, 6), flags: 'k' });
+    }
+  }
+  if (us === 'w' ? s.castling.Q : s.castling.q){
+    if (!s.board[sqIdx(home, 1)] && !s.board[sqIdx(home, 2)] && !s.board[sqIdx(home, 3)] && s.board[sqIdx(home, 0)] === KR &&
+        !isAttacked(s, i, them) && !isAttacked(s, sqIdx(home, 3), them) && !isAttacked(s, sqIdx(home, 2), them)){
+      moves.push({ from: i, to: sqIdx(home, 2), flags: 'q' });
+    }
+  }
+  return moves;
+}
+
+function generatePseudoMoves(s, captureOnly){
+  const moves = [];
+  const us = s.turn, them = us === 'w' ? 'b' : 'w';
+  const b = s.board;
+  for (let i = 0; i < 64; i++){
+    const p = b[i];
+    if (!p || pieceColor(p) !== us) continue;
+    const r = rankOf(i), f = fileOf(i);
+    const t = p.toUpperCase();
+    if (t === 'P'){
+      const dir = us === 'w' ? -1 : 1;
+      const start = us === 'w' ? 6 : 1;
+      const promoRow = us === 'w' ? 0 : 7;
+      const nr = r + dir;
+      if (nr >= 0 && nr < 8){
+        if (!captureOnly && !b[sqIdx(nr, f)]){
+          if (nr === promoRow){
+            for (const q of ['Q', 'R', 'B', 'N']) moves.push({ from: i, to: sqIdx(nr, f), flags: 'p', promo: q });
+          } else {
+            moves.push({ from: i, to: sqIdx(nr, f), flags: 'n' });
+            if (r === start && !b[sqIdx(r + 2 * dir, f)]) moves.push({ from: i, to: sqIdx(r + 2 * dir, f), flags: 'dc' });
+          }
+        }
+        for (const df of [-1, 1]){
+          const nf = f + df;
+          if (nf < 0 || nf > 7) continue;
+          const to = sqIdx(nr, nf);
+          const tgt = b[to];
+          if (tgt && pieceColor(tgt) === them){
+            if (nr === promoRow){ for (const q of ['Q', 'R', 'B', 'N']) moves.push({ from: i, to, flags: 'pc', promo: q }); }
+            else moves.push({ from: i, to, flags: 'c' });
+          } else if (s.ep === to){
+            moves.push({ from: i, to, flags: 'ep' });
+          }
+        }
+      }
+    } else if (t === 'N'){
+      for (const [df, dr] of KNIGHT_STEPS){
+        const nr = r + dr, nf = f + df;
+        if (nr < 0 || nr > 7 || nf < 0 || nf > 7) continue;
+        const to = sqIdx(nr, nf), tgt = b[to];
+        if (!tgt){ if (!captureOnly) moves.push({ from: i, to, flags: 'n' }); }
+        else if (pieceColor(tgt) === them) moves.push({ from: i, to, flags: 'c' });
+      }
+    } else if (t === 'B' || t === 'R' || t === 'Q'){
+      const dirs = t === 'B' ? BISHOP_DIRS : (t === 'R' ? ROOK_DIRS : QUEEN_DIRS);
+      for (const [df, dr] of dirs){
+        let nr = r + dr, nf = f + df;
+        while (nr >= 0 && nr < 8 && nf >= 0 && nf < 8){
+          const to = sqIdx(nr, nf), tgt = b[to];
+          if (!tgt){
+            if (!captureOnly) moves.push({ from: i, to, flags: 'n' });
+          } else {
+            if (pieceColor(tgt) === them) moves.push({ from: i, to, flags: 'c' });
+            break;
+          }
+          nr += dr; nf += df;
+        }
+      }
+    } else {
+      for (const [df, dr] of KING_STEPS){
+        const nr = r + dr, nf = f + df;
+        if (nr < 0 || nr > 7 || nf < 0 || nf > 7) continue;
+        const to = sqIdx(nr, nf), tgt = b[to];
+        if (!tgt){ if (!captureOnly) moves.push({ from: i, to, flags: 'n' }); }
+        else if (pieceColor(tgt) === them) moves.push({ from: i, to, flags: 'c' });
+      }
+      if (!captureOnly) moves.push(...castleMoves(s, i));
+    }
+  }
+  return moves;
+}
+function generateLegalMoves(s, captureOnly){
+  const pseudo = generatePseudoMoves(s, captureOnly);
+  const legal = [];
+  const mover = s.turn;
+  for (const mv of pseudo){
+    const undo = makeMove(s, mv);
+    const safe = !inCheck(s, mover);
+    unmakeMove(s, mv, undo);
+    if (safe) legal.push(mv);
+  }
+  return legal;
+}
+
+/* ---- 评估 ---- */
+const MATERIAL = { P: 100, N: 320, B: 330, R: 500, Q: 900, K: 0 };
+const PST_P = [0,0,0,0,0,0,0,0, 50,50,50,50,50,50,50,50, 10,10,20,30,30,20,10,10, 5,5,10,25,25,10,5,5, 0,0,0,20,20,0,0,0, 5,-5,-10,0,0,-10,-5,5, 5,10,10,-20,-20,10,10,5, 0,0,0,0,0,0,0,0];
+const PST_N = [-50,-40,-30,-30,-30,-30,-40,-50, -40,-20,0,0,0,0,-20,-40, -30,0,10,15,15,10,0,-30, -30,5,15,20,20,15,5,-30, -30,0,15,20,20,15,0,-30, -30,5,10,15,15,10,5,-30, -40,-20,0,5,5,0,-20,-40, -50,-40,-30,-30,-30,-30,-40,-50];
+const PST_B = [-20,-10,-10,-10,-10,-10,-10,-20, -10,0,0,0,0,0,0,-10, -10,0,5,10,10,5,0,-10, -10,5,5,10,10,5,5,-10, -10,0,10,10,10,10,0,-10, -10,10,10,10,10,10,10,-10, -10,5,0,0,0,0,5,-10, -20,-10,-10,-10,-10,-10,-10,-20];
+const PST_R = [0,0,0,0,0,0,0,0, 5,10,10,10,10,10,10,5, -5,0,0,0,0,0,0,-5, -5,0,0,0,0,0,0,-5, -5,0,0,0,0,0,0,-5, -5,0,0,0,0,0,0,-5, -5,0,0,0,0,0,0,-5, 0,0,0,5,5,0,0,0];
+const PST_Q = [-20,-10,-10,-5,-5,-10,-10,-20, -10,0,0,0,0,0,0,-10, -10,0,5,5,5,5,0,-10, -5,0,5,5,5,5,0,-5, 0,0,5,5,5,5,0,-5, -10,5,5,5,5,5,0,-10, -10,0,5,0,0,0,0,-10, -20,-10,-10,-5,-5,-10,-10,-20];
+const PST_K = [-30,-40,-40,-50,-50,-40,-40,-30, -30,-40,-40,-50,-50,-40,-40,-30, -30,-40,-40,-50,-50,-40,-40,-30, -30,-40,-40,-50,-50,-40,-40,-30, -20,-30,-30,-40,-40,-30,-30,-20, -10,-20,-20,-20,-20,-20,-20,-10, 20,20,0,0,0,0,20,20, 20,30,10,0,0,10,30,20];
+const PST = { P: PST_P, N: PST_N, B: PST_B, R: PST_R, Q: PST_Q, K: PST_K };
+
+function pstValue(p, i){
+  const t = p.toUpperCase();
+  const idx = isWhite(p) ? i : (7 - rankOf(i)) * 8 + fileOf(i);
+  return PST[t][idx];
+}
+function evaluate(s){
+  let score = 0;
+  const b = s.board;
+  for (let i = 0; i < 64; i++){
+    const p = b[i];
+    if (!p) continue;
+    const v = MATERIAL[p.toUpperCase()] + pstValue(p, i);
+    score += isWhite(p) ? v : -v;
+  }
+  return s.turn === 'w' ? score : -score;
+}
+
+/* ---- 搜索 ---- */
+let nodes = 0, deadline = 0, aborted = false;
+const NODE_CAP = 4000000;
+
+function mvScore(s, mv){
+  const pc = s.board[mv.from];
+  if (mv.flags === 'c' || mv.flags === 'pc'){
+    const cap = mv.flags === 'ep' ? 100 : MATERIAL[s.board[mv.to].toUpperCase()];
+    return 10000 + 10 * cap - MATERIAL[pc.toUpperCase()];
+  }
+  if (mv.flags === 'p') return 8000 + MATERIAL[mv.promo];
+  if (mv.flags === 'k' || mv.flags === 'q') return 600;
+  return 0;
+}
+function orderMoves(s, moves){
+  const n = moves.length;
+  const sc = new Array(n);
+  for (let i = 0; i < n; i++) sc[i] = mvScore(s, moves[i]);
+  for (let i = 1; i < n; i++){
+    const m = moves[i], v = sc[i];
+    let j = i - 1;
+    while (j >= 0 && sc[j] < v){ moves[j + 1] = moves[j]; sc[j + 1] = sc[j]; j--; }
+    moves[j + 1] = m; sc[j + 1] = v;
+  }
+}
+function tick(){
+  if ((nodes & 1023) === 0 && (Date.now() > deadline || nodes > NODE_CAP)) aborted = true;
+  nodes++;
+}
+function quiescence(s, alpha, beta, ply){
+  tick();
+  if (aborted) return 0;
+  const stand = evaluate(s);
+  if (stand >= beta) return beta;
+  if (stand > alpha) alpha = stand;
+  if (ply > 28) return alpha;
+  const moves = generateLegalMoves(s, true);
+  if (moves.length){
+    orderMoves(s, moves);
+    for (const mv of moves){
+      const undo = makeMove(s, mv);
+      const sc = -quiescence(s, -beta, -alpha, ply + 1);
+      unmakeMove(s, mv, undo);
+      if (aborted) return 0;
+      if (sc >= beta) return beta;
+      if (sc > alpha) alpha = sc;
+    }
+  }
+  return alpha;
+}
+function alphaBeta(s, depth, alpha, beta, ply){
+  tick();
+  if (aborted) return 0;
+  if (depth <= 0) return quiescence(s, alpha, beta, ply);
+  const moves = generateLegalMoves(s);
+  if (moves.length === 0) return inCheck(s, s.turn) ? -(MATE - ply) : 0;
+  orderMoves(s, moves);
+  let best = -Infinity;
+  for (const mv of moves){
+    const undo = makeMove(s, mv);
+    const sc = -alphaBeta(s, depth - 1, -beta, -alpha, ply + 1);
+    unmakeMove(s, mv, undo);
+    if (aborted) return 0;
+    if (sc > best) best = sc;
+    if (best > alpha) alpha = best;
+    if (alpha >= beta) break;
+  }
+  return best;
+}
+function findBestMove(s, timeMs, maxDepth){
+  const moves = generateLegalMoves(s);
+  if (moves.length === 0) return null;
+  orderMoves(s, moves);
+  deadline = Date.now() + timeMs;
+  nodes = 0; aborted = false;
+  let best = moves[0], bestScore = -Infinity;
+  for (let d = 1; d <= maxDepth; d++){
+    aborted = false;
+    let dBest = null, dScore = -Infinity;
+    for (const mv of moves){
+      const undo = makeMove(s, mv);
+      let sc = -alphaBeta(s, d - 1, -Infinity, Infinity, 1);
+      unmakeMove(s, mv, undo);
+      if (aborted) break;
+      sc += (Math.random() * 14 - 7);
+      if (sc > dScore){ dScore = sc; dBest = mv; }
+    }
+    if (aborted) break;
+    best = dBest; bestScore = dScore;
+    if (Math.abs(bestScore) > MATE - 500) break;
+  }
+  return best;
+}
+
+/* ---- 对局状态 ---- */
+function insufficientMaterial(s){
+  let minors = 0;
+  const bishops = [];
+  for (let i = 0; i < 64; i++){
+    const p = s.board[i];
+    if (!p) continue;
+    const t = p.toUpperCase();
+    if (t === 'P' || t === 'R' || t === 'Q') return false;
+    if (t === 'N') minors++;
+    if (t === 'B') bishops.push([isWhite(p) ? 'w' : 'b', (rankOf(i) + fileOf(i)) & 1]);
+  }
+  if (minors + bishops.length <= 1) return true;
+  if (minors === 0 && bishops.length === 2 && bishops[0][1] === bishops[1][1]) return true;
+  return false;
+}
+function gameStatus(s){
+  const moves = generateLegalMoves(s);
+  const chk = inCheck(s, s.turn);
+  if (moves.length === 0){
+    return { over: true, type: chk ? 'checkmate' : 'stalemate', winner: chk ? (s.turn === 'w' ? 'b' : 'w') : null };
+  }
+  if (insufficientMaterial(s)) return { over: true, type: 'draw', winner: null, reason: 'insufficient' };
+  return { over: false, check: chk };
+}
+function perft(s, depth){
+  if (depth === 0) return 1;
+  const moves = generateLegalMoves(s);
+  if (depth === 1) return moves.length;
+  let n = 0;
+  for (const mv of moves){
+    const undo = makeMove(s, mv);
+    n += perft(s, depth - 1);
+    unmakeMove(s, mv, undo);
+  }
+  return n;
+}
+
+const CHESS = {
+  fenToState, stateToFen, posKey, sqName, parseSq,
+  generateLegalMoves, makeMove, unmakeMove, inCheck, isAttacked, findKing, isWhite, pieceColor,
+  evaluate, findBestMove, gameStatus, insufficientMaterial, perft,
+  START_FEN, MATERIAL, sqIdx, rankOf, fileOf
+};
+if (typeof globalThis !== 'undefined') globalThis.CHESS = CHESS;
+
+/* ===================== 万圣节卡通棋子 ===================== */
+function halloweenSvgSet(){
+  const PAL = {
+    W: { fill: '#FFE3B8', stroke: '#3A2350', detail: '#3A2350' },
+    B: { fill: '#2A1840', stroke: '#F28C28', detail: '#FFB347' }
+  };
+  const S = {
+    K: [
+      ['M13 13.5l2.8-4.2 6.7 3.4 6.7-3.4 2.8 4.2z', 'body'],
+      ['M13.6 9.2a1.3 1.3 0 1 1-2.6 0a1.3 1.3 0 1 1 2.6 0zM31.4 9.2a1.3 1.3 0 1 1-2.6 0a1.3 1.3 0 1 1 2.6 0z', 'detail'],
+      ['M22.5 16.5c-.8-2.4.4-4.8 1.9-6', 'stroke'],
+      ['M22.5 39.5c-6.3 0-10.2-4.3-10.2-10.8S16.2 18 22.5 18s10.2 4.3 10.2 10.7S28.8 39.5 22.5 39.5z', 'body'],
+      ['M15.5 21c-1.4 5-1.4 11 0 15.5M29.5 21c1.4 5 1.4 11 0 15.5', 'stroke'],
+      ['M17.5 25.5l2.6 3-2.6 3zM27.5 25.5l-2.6 3 2.6 3z', 'detail'],
+      ['M22.5 29.8l1.5 1.9-1.5 1.9z', 'detail'],
+      ['M17 36.5h11l-1.6-2-2.4 2-2.4-2-2.4 2-2.2-2z', 'detail']
+    ],
+    Q: [
+      ['M9.5 18.4c0 1.6 5.8 2.9 13 2.9s13-1.3 13-2.9v-2H9.5z', 'body'],
+      ['M9.5 17.5h26', 'stroke'],
+      ['M22.5 3.2l-8.8 14.3h17.6z', 'body'],
+      ['M22.5 8.2l.9 1.8 2 .3-1.4 1.4.3 2-1.8-.9-1.8.9.3-2-1.4-1.4 2-.3z', 'detail'],
+      ['M17.6 25.5a4.9 4.9 0 1 0 9.8 0 4.9 4.9 0 1 0-9.8 0z', 'body'],
+      ['M20.4 24.3a1.1 1.1 0 1 0 2.2 0 1.1 1.1 0 1 0-2.2 0zM24.6 24.3a1.1 1.1 0 1 0 2.2 0 1.1 1.1 0 1 0-2.2 0z', 'detail'],
+      ['M22.5 30.4c-4.9 0-8.5 3.9-8.5 8.7 0 1.1.4 1.9 1.1 2.4h14.8c.7-.5 1.1-1.3 1.1-2.4 0-4.8-3.6-8.7-8.5-8.7z', 'body'],
+      ['M29.5 36.5l6.2-8', 'stroke'],
+      ['M35.7 28.5l-2.1 1.2-1.1-2.1-2.1 1.2-1.1-2.1', 'stroke']
+    ],
+    R: [
+      ['M9 23v-5l3 2.4 3-2.4 3 2.4 3-2.4 3 2.4 3-2.4 3 2.4 3-2.4 3 2.4v5z', 'body'],
+      ['M9 40h27V23H9z', 'body'],
+      ['M16.9 29.5a2.5 2.5 0 1 0 5 0 2.5 2.5 0 1 0-5 0zM28.1 29.5a2.5 2.5 0 1 0 5 0 2.5 2.5 0 1 0-5 0z', 'detail'],
+      ['M22.5 40v-4.6c0-1.3-1.1-2.3-2.4-2.3h-1.5v6.9z', 'detail'],
+      ['M22.5 12.5c-2.7 0-4.4 1.8-4.4 4.1 0 2.4 1.7 4.1 4.4 4.1s4.4-1.7 4.4-4.1c0-2.3-1.7-4.1-4.4-4.1z', 'detail'],
+      ['M22.5 12.4c.2-1 .6-1.8 1.4-2.3', 'stroke']
+    ],
+    N: [
+      ['M17.9 14.8l-2.5-4.6 3.7 2.7zM27.1 14.8l2.5-4.6-3.7 2.7z', 'body'],
+      ['M22.5 16.6c-3.4 0-5.9 2.5-5.9 5.7 0 1.7 1 3.2 2.4 4.2 1 .5 2.2.8 3.5.8s2.5-.3 3.5-.8c1.4-1 2.4-2.5 2.4-4.2 0-3.2-2.5-5.7-5.9-5.7z', 'body'],
+      ['M17.8 24.6C12.3 21.7 7.6 23.3 6 28.4l1.7 2.1 1.5-2.3 1.6 2.9 1.9-2.3 1.7 3.1 2.1-2.5 1.9 2.1 1.4-3.3.5-5z', 'body'],
+      ['M27.2 24.6c5.5-2.9 10.2-1.3 11.8 3.8l-1.7 2.1-1.5-2.3-1.6 2.9-1.9-2.3-1.7 3.1-2.1-2.5-1.9 2.1-1.4-3.3-.5-5z', 'body'],
+      ['M22.5 29.6c-3.5 0-5.9 2.5-5.9 6.1 0 .9.2 1.7.6 2.3h10.6c.4-.6.6-1.4.6-2.3 0-3.6-2.4-6.1-5.9-6.1z', 'body'],
+      ['M20.3 19.2a1.2 1.2 0 1 0 2.4 0 1.2 1.2 0 1 0-2.4 0zM24.7 19.2a1.2 1.2 0 1 0 2.4 0 1.2 1.2 0 1 0-2.4 0z', 'detail'],
+      ['M20 25.4q2.5 1.9 5 0', 'stroke']
+    ],
+    B: [
+      ['M22.5 18.8c-.8-2.3.5-4.7 2-6', 'stroke'],
+      ['M22.5 14c2-1.1 3.9-.9 5.2.2', 'stroke'],
+      ['M22.5 39.5c-6 0-9.7-4.3-9.7-10.4S16.5 18.6 22.5 18.6s9.7 4.3 9.7 10.5S28.5 39.5 22.5 39.5z', 'body'],
+      ['M15.9 22.6c-1.3 4.9-1.3 10.7 0 15.4M29.1 22.6c1.3 4.9 1.3 10.7 0 15.4', 'stroke'],
+      ['M17.7 26l2.3 2.8-2.3 2.8zM27.3 26l-2.3 2.8 2.3 2.8z', 'detail'],
+      ['M18 36.5h9l-1.4-1.8-2 1.8-2-1.8-2 1.8-1.6-1.8z', 'detail']
+    ],
+    P: [
+      ['M14.5 15a8 8 0 0 1 16 0z', 'body'],
+      ['M14.5 15v15.5h16V15z', 'body'],
+      ['M14.5 30.5v4.4a2.5 2.5 0 0 1 5 0V30.5h.5v4.4a2.5 2.5 0 0 1 5 0V30.5h.5v4.4a2.5 2.5 0 0 1 5 0V30.5', 'body'],
+      ['M19.4 12.8a1.6 1.6 0 1 0 3.2 0 1.6 1.6 0 1 0-3.2 0zM25.6 12.8a1.6 1.6 0 1 0 3.2 0 1.6 1.6 0 1 0-3.2 0z', 'detail'],
+      ['M20 19.5q2.5 2.2 5 0', 'stroke']
+    ]
+  };
+  const out = {};
+  const build = (name, col) => {
+    const C = PAL[col];
+    let g = '';
+    for (const [d, kind] of S[name]){
+      const fill = kind === 'body' ? C.fill : (kind === 'detail' ? C.detail : 'none');
+      const stroke = kind === 'stroke' ? C.detail : C.stroke;
+      const w = kind === 'stroke' ? 1.6 : 2;
+      g += '<path d="' + d + '" fill="' + fill + '" stroke="' + stroke + '" stroke-width="' + w + '" stroke-linecap="round" stroke-linejoin="round"/>';
+    }
+    out[name + col] = '<g>' + g + '</g>';
+  };
+  ['K', 'Q', 'R', 'B', 'N', 'P'].forEach(n => { build(n, 'W'); build(n, 'B'); });
+  return out;
+}
+const HALLOWEEN_SVG = halloweenSvgSet();
+
+/* ===================== 花园与骑士棋子（中世纪法兰西卡通） ===================== */
+function gardenSvgSet(){
+  // 方案B：白方=法兰西王室，黑方=反叛封建领主，同兵种两套独立卡通造型
+  const PAL = {
+    W: { fill: '#FFF3DC', stroke: '#3560A8', detail: '#C9A227' },
+    B: { fill: '#592626', stroke: '#D4AF60', detail: '#E8C97A' }
+  };
+  const SW = {
+    K: [
+      ['M14.5 12h16l-2.2-4.4-3.8 2.6-3.2-2.6-3.2 2.6-3.8-2.6z', 'body'],
+      ['M19 9.5h7l-1.2-2.4h-4.6z', 'detail'],
+      ['M16.8 11.5h11.4', 'detail'],
+      ['M22.5 7l1.6-1.6', 'detail'],
+      ['M17.7 19.5a4.8 4.8 0 1 0 9.6 0 4.8 4.8 0 1 0-9.6 0z', 'body'],
+      ['M20.2 18a1 1 0 1 0 2 0 1 1 0 1 0-2 0zM24.8 18a1 1 0 1 0 2 0 1 1 0 1 0-2 0z', 'detail'],
+      ['M20.4 21.8h4.2', 'stroke'],
+      ['M22.5 24.5c-4.6 0-8 3.4-8 8v7.5h16v-7.5c0-4.6-3.4-8-8-8z', 'body'],
+      ['M20.3 28h4.4M22.5 26v4.4', 'stroke'],
+      ['M17.2 29h10.6M16.5 32h12', 'stroke'],
+      ['M27.2 12.5l.8 13.5', 'stroke'],
+      ['M28 11.2a1.3 1.3 0 1 0 2.6 0 1.3 1.3 0 1 0-2.6 0z', 'detail']
+    ],
+    Q: [
+      ['M22.5 14a4.6 4.6 0 1 0 .1 0z', 'body'],
+      ['M15.8 12.5c-4.4 1.4-6.3 4.8-5.6 8.6.5 2.8 1.6 5.4 3.3 7.5l3.6 2.8 5.4-4 5.4 4 3.6-2.8c1.7-2.1 2.8-4.7 3.3-7.5.7-3.8-1.2-7.2-5.6-8.6z', 'body'],
+      ['M18.2 18.5c1.4 1.8 2.9 3.2 4.3 4.2M26.8 18.5c-1.4 1.8-2.9 3.2-4.3 4.2', 'stroke'],
+      ['M20.6 12.8a1.1 1.1 0 1 0 2.2 0 1.1 1.1 0 1 0-2.2 0zM24.4 12.8a1.1 1.1 0 1 0 2.2 0 1.1 1.1 0 1 0-2.2 0z', 'detail'],
+      ['M22.5 27c-5.2 0-8.8 3.7-8.8 8.6V40h17.6v-4.4c0-4.9-3.6-8.6-8.8-8.6z', 'body'],
+      ['M13.7 35.5h17.6M15 38.5h15M18.5 31h8', 'stroke'],
+      ['M30.5 17.5l1 2.4 2.6-.3-2.1 1.6.9 2.4-2.4-1.7-2.4 1.7.9-2.4-2.1-1.6 2.6.3z', 'detail'],
+      ['M30.5 24.5v2.5', 'stroke']
+    ],
+    R: [
+      ['M22.5 9.5l-5.2 7.5h10.4z', 'body'],
+      ['M9 23v-5l3 2.4 3-2.4 3 2.4 3-2.4 3 2.4 3-2.4 3 2.4 3-2.4 3 2.4v5z', 'body'],
+      ['M9 40h27V23H9z', 'body'],
+      ['M22.5 9.5v-3.2l4 1.6-4 1.6z', 'detail'],
+      ['M22.5 5.8l1.2 2.1 2.4-.3-1.9 1.4.8 2.2-2.5-1.2-2.5 1.2.8-2.2-1.9-1.4 2.4.3z', 'detail'],
+      ['M17.3 28.5a2.2 2.2 0 1 0 4.4 0 2.2 2.2 0 1 0-4.4 0zM27.7 28.5a2.2 2.2 0 1 0 4.4 0 2.2 2.2 0 1 0-4.4 0z', 'detail'],
+      ['M22.5 40v-4.8c0-1.5-1.2-2.7-2.7-2.7h-1.6v7.5z', 'detail'],
+      ['M12.5 23v14M17 23v14M28 23v14M32.5 23v14', 'stroke']
+    ],
+    B: [
+      ['M22.5 10.5a5.4 5.4 0 1 0 .1 0z', 'body'],
+      ['M20.4 8.9a1.1 1.1 0 1 0 2.2 0 1.1 1.1 0 1 0-2.2 0zM24.6 8.9a1.1 1.1 0 1 0 2.2 0 1.1 1.1 0 1 0-2.2 0z', 'detail'],
+      ['M22.5 12.4v2', 'stroke'],
+      ['M16.6 17.5c3.9 3.4 8.4 3.4 12.3 0 .6 3.7-2.3 6.6-6.2 6.6s-6.7-2.9-6.1-6.6z', 'body'],
+      ['M18.5 22.6c1.4.7 2.7 1 4 1s2.6-.3 4-1', 'stroke'],
+      ['M22.5 27c-4.8 0-8 3.4-8 8V40h16v-5.5c0-4.6-3.2-8-8-8z', 'body'],
+      ['M14.5 40h16M15.8 34.5h13.4M18 30.5h9', 'stroke'],
+      ['M19.2 32h6.6v3.6h-6.6z', 'detail'],
+      ['M22.5 32v3.6', 'detail'],
+      ['M22.5 27.5l1.1.9-1.1.9-1.1-.9z', 'detail']
+    ],
+    N: [
+      ['M22.5 12.5a4.6 4.6 0 1 0 .1 0z', 'body'],
+      ['M20.8 11a1.2 1.2 0 1 0 2.4 0 1.2 1.2 0 1 0-2.4 0zM24.2 11a1.2 1.2 0 1 0 2.4 0 1.2 1.2 0 1 0-2.4 0z', 'detail'],
+      ['M22.5 8.5v-3M22.5 8.5l-1.9-1.5', 'stroke'],
+      ['M18.5 17.5h8v9h-8z', 'body'],
+      ['M17 18.5c-2.2 2.6-2.2 6.2 0 8.9 3.7-1.5 9.3-1.5 13 0 2.2-2.7 2.2-6.3 0-8.9z', 'body'],
+      ['M20.5 20h4M21.5 22.5h2', 'stroke'],
+      ['M30.5 11l2 24', 'stroke'],
+      ['M31.5 11l-1.6-2.2', 'detail'],
+      ['M13.5 31.5c0-4.6 4-8.3 9-8.3s9 3.7 9 8.3v2H13.5z', 'body'],
+      ['M16 33.5v5M19.2 33.5v5M25.8 33.5v5M29 33.5v5', 'stroke'],
+      ['M14.5 25.5c3.4 1.9 7.6 1.9 11 0v2.6c-3.4 1.9-7.6 1.9-11 0z', 'detail'],
+      ['M13.5 29.5c-3.8 0-5.9 2.4-5.9 5.4 0 2 1.1 3.8 2.8 4.8V37h4.5v-3c-.4-1.9-.1-3.7 1.7-4.6z', 'body'],
+      ['M10.2 26.5l-1.2-2.6 2.4 1.5', 'detail'],
+      ['M9 32.5a1.6 1.6 0 1 0 3.2 0 1.6 1.6 0 1 0-3.2 0z', 'detail'],
+      ['M10.6 37v3', 'stroke']
+    ],
+    P: [
+      ['M22.5 10a3.4 3.4 0 1 0 .1 0z', 'body'],
+      ['M17.8 12.2c1.3 1.1 3.1 1.6 4.7 1.6s3.4-.5 4.7-1.6c-.4 1.3-2.3 2.4-4.7 2.4s-4.3-1.1-4.7-2.4z', 'body'],
+      ['M22.5 17a4.2 4.2 0 1 0 .1 0z', 'body'],
+      ['M20.2 15.8a.9.9 0 1 0 1.8 0 .9.9 0 1 0-1.8 0zM24.8 15.8a.9.9 0 1 0 1.8 0 .9.9 0 1 0-1.8 0z', 'detail'],
+      ['M22.5 22c-4 0-7 3-7 6.7V40h14v-6.8c0-3.7-3-6.7-7-6.7z', 'body'],
+      ['M15.5 27.5h14', 'stroke'],
+      ['M30.5 14l.6 6', 'stroke'],
+      ['M31.1 13.4l-1-1.7 1.1-.8 1.2 1.1z', 'detail']
+    ]
+  };
+  const SB = {
+    K: [
+      ['M22.5 12.5a5 5 0 1 0 .1 0z', 'body'],
+      ['M20.4 11a1.1 1.1 0 1 0 2.2 0 1.1 1.1 0 1 0-2.2 0zM24.6 11a1.1 1.1 0 1 0 2.2 0 1.1 1.1 0 1 0-2.2 0z', 'detail'],
+      ['M22.5 13.5v2', 'stroke'],
+      ['M16.8 18.5c3.6 3 8 3 11.6 0 .5 3.6-2.2 6.5-5.8 6.5s-6.3-2.9-5.8-6.5z', 'body'],
+      ['M17 10.5h11M22.5 8.8v1.7', 'detail'],
+      ['M22.5 8.8l-1.6-.9 1.6-.9 1.6.9z', 'detail'],
+      ['M13.5 20.5c-2.6 2-3.6 5.4-3.6 9.5v8h25v-8c0-4.1-1-7.5-3.6-9.5z', 'body'],
+      ['M15 31h23M17 27h21M14.8 38h25.4', 'stroke'],
+      ['M28.5 12.5l1.2 13.5', 'stroke'],
+      ['M27 10.5h4.6v3.4h-4.6z', 'body'],
+      ['M27 12h4.6', 'stroke']
+    ],
+    Q: [
+      ['M22.5 14a4.6 4.6 0 1 0 .1 0z', 'body'],
+      ['M14.2 12.5c-3.8 2.6-5.2 6.8-4.3 10.8l3.2 2.7 9.4-4.6 9.4 4.6 3.2-2.7c.9-4-.5-8.2-4.3-10.8z', 'body'],
+      ['M17.6 18.8c1.3 1.7 3 3.1 4.9 4.1M27.4 18.8c-1.3 1.7-3 3.1-4.9 4.1', 'stroke'],
+      ['M20.6 12.6a1.1 1.1 0 1 0 2.2 0 1.1 1.1 0 1 0-2.2 0zM24.4 12.6a1.1 1.1 0 1 0 2.2 0 1.1 1.1 0 1 0-2.2 0z', 'detail'],
+      ['M16 21.5h13', 'stroke'],
+      ['M18.3 21.5l-1.3-1M22.5 21.5l-1.3-1M26.7 21.5l-1.3-1', 'stroke'],
+      ['M22.5 27c-5.2 0-8.8 3.7-8.8 8.6V40h17.6v-4.4c0-4.9-3.6-8.6-8.8-8.6z', 'body'],
+      ['M13.7 35.5h17.6M15 38.5h15M18.5 31h8', 'stroke'],
+      ['M30.5 16.5c.6 1.8.6 4 .1 6', 'stroke'],
+      ['M31.4 18.5l1.4-.9M29.8 20.8l-1.4-.6M30.8 22.6l1.2-.9', 'stroke']
+    ],
+    R: [
+      ['M9 18v-3.5l2 2 2-2 2 2 2-2 2 2 2-2 2 2 2-2 2 2 2-2 2 2 2-2 2 2v3.5z', 'body'],
+      ['M9 23h27v14H9z', 'body'],
+      ['M14 23v14M19 23v14M24 23v14M29 23v14', 'stroke'],
+      ['M17.3 28.5a2.2 2.2 0 1 0 4.4 0 2.2 2.2 0 1 0-4.4 0zM27.7 28.5a2.2 2.2 0 1 0 4.4 0 2.2 2.2 0 1 0-4.4 0z', 'detail'],
+      ['M22.5 40v-4.8c0-1.5-1.2-2.7-2.7-2.7h-1.6v7.5z', 'detail']
+    ],
+    B: [
+      ['M22.5 10.5a5.4 5.4 0 1 0 .1 0z', 'body'],
+      ['M20.4 8.9a1.1 1.1 0 1 0 2.2 0 1.1 1.1 0 1 0-2.2 0zM24.6 8.9a1.1 1.1 0 1 0 2.2 0 1.1 1.1 0 1 0-2.2 0z', 'detail'],
+      ['M22.5 12.4v2', 'stroke'],
+      ['M16.3 17.3c4 3.5 8.7 3.5 12.7 0 .6 3.8-2.4 6.8-6.4 6.8s-7-3-6.3-6.8z', 'body'],
+      ['M18.2 22.8c1.5.7 2.9 1 4.3 1s2.8-.3 4.3-1', 'stroke'],
+      ['M22.5 27c-4.6 0-7.8 3.2-7.8 7.8V40h15.6v-5.2c0-4.6-3.2-7.8-7.8-7.8z', 'body'],
+      ['M14.7 40h15.6M16 34.5h13M17.5 30.5h10', 'stroke'],
+      ['M17.5 32.5h10', 'detail'],
+      ['M22.5 32.5v2', 'detail'],
+      ['M22.5 28.5v3.5M20.5 29.5h4', 'detail']
+    ],
+    N: [
+      ['M22.5 12.5a4.6 4.6 0 1 0 .1 0z', 'body'],
+      ['M22.5 10.5v3', 'stroke'],
+      ['M19.5 12.5l-1.5-2.2M25.5 12.5l1.5-2.2', 'stroke'],
+      ['M18.5 17.5h8v9h-8z', 'body'],
+      ['M17 18.5c-2.2 2.6-2.2 6.2 0 8.9 3.7-1.5 9.3-1.5 13 0 2.2-2.7 2.2-6.3 0-8.9z', 'body'],
+      ['M20.5 20h4M21.5 22.5h2', 'stroke'],
+      ['M30 11.5l1.6 22.5', 'stroke'],
+      ['M28.8 10.2l3.6 1.8-1.1 2.2-2.7-1.2z', 'detail'],
+      ['M13.5 31.5c0-4.6 4-8.3 9-8.3s9 3.7 9 8.3v2H13.5z', 'body'],
+      ['M16 33.5v5M19.2 33.5v5M25.8 33.5v5M29 33.5v5', 'stroke'],
+      ['M13.5 29.5c-3.8 0-5.9 2.4-5.9 5.4 0 2 1.1 3.8 2.8 4.8V37h4.5v-3c-.4-1.9-.1-3.7 1.7-4.6z', 'body'],
+      ['M10.2 26.5l-1.2-2.6 2.4 1.5', 'detail'],
+      ['M9 32.5a1.6 1.6 0 1 0 3.2 0 1.6 1.6 0 1 0-3.2 0z', 'detail'],
+      ['M10.6 37v3', 'stroke'],
+      ['M27.5 24.5l3.2 2.2-1.2 3.6-3.6-1.2z', 'detail']
+    ],
+    P: [
+      ['M22.5 9.5a3.2 3.2 0 1 0 .1 0z', 'body'],
+      ['M18.3 11.5c-1.6 1.7-1.6 4.6 0 6.3h8.4c1.6-1.7 1.6-4.6 0-6.3z', 'body'],
+      ['M22.5 17.8v2', 'stroke'],
+      ['M20.2 15.5a.9.9 0 1 0 1.8 0 .9.9 0 1 0-1.8 0zM24.8 15.5a.9.9 0 1 0 1.8 0 .9.9 0 1 0-1.8 0z', 'detail'],
+      ['M22.5 22c-4 0-7 3-7 6.7V40h14v-6.8c0-3.7-3-6.7-7-6.7z', 'body'],
+      ['M15.5 27.5h14M17 31.5h11', 'stroke'],
+      ['M30.5 13.5v15', 'stroke'],
+      ['M27.3 12.5l3.2 6 3.2-6', 'stroke']
+    ]
+  };
+  const S = { W: SW, B: SB };
+  const out = {};
+  const build = (name, col) => {
+    const C = PAL[col];
+    let g = '';
+    for (const [d, kind] of S[col][name]){
+      const fill = kind === 'body' ? C.fill : (kind === 'detail' ? C.detail : 'none');
+      const stroke = kind === 'stroke' ? C.detail : C.stroke;
+      const w = kind === 'stroke' ? 1.1 : 1.35;
+      g += '<path d="' + d + '" fill="' + fill + '" stroke="' + stroke + '" stroke-width="' + w + '" stroke-linecap="round" stroke-linejoin="round"/>';
+    }
+    out[name + col] = '<g>' + g + '</g>';
+  };
+  ['K', 'Q', 'R', 'B', 'N', 'P'].forEach(n => { build(n, 'W'); build(n, 'B'); });
+  return out;
+}
+const GARDEN_SVG = gardenSvgSet();
+
+/* 棋盘花纹装饰（万圣节皮肤下的格子背景图案，8 种循环、按格确定性分布） */
+const DECO_SHAPES = [
+  // 南瓜
+  '<path d="M12 4.5c-.9-1.4-2.6-1.5-3.4-.2C7.2 6.7 6.5 8.4 6.5 10.6c0 3.2 2.4 5.7 5.5 5.7s5.5-2.5 5.5-5.7c0-2.2-.7-3.9-2.1-6.3-.8-1.3-2.5-1.2-3.4.2z"/><path d="M12 4.5c.2-1 .5-2 .4-3.2M10 10.5l1.5 1.7L10 14zM14 10.5l-1.5 1.7L14 14zM10.5 16h3l-.5-.6-1 .6-1-.6z"/>',
+  // 幽灵
+  '<path d="M12 4a5.2 5.2 0 0 0-5.2 5.2c0 2 1 3.7 2.6 4.7-2.5.7-4.1 3-4.1 5.6 0 2.1 1.3 3.7 3.1 4.6 1.2-1.2 2.1-3 2.5-4.8 1.2 2.4 3 4.2 5.1 4.8V21c0-1.2 1-2.2 2.2-2.2s2.2 1 2.2 2.2v-.9c1.6-.6 3-1.9 3.8-3.6.9 1.4 1.8 2.6 2.7 3.4 1.7-.9 2.9-2.5 2.9-4.5 0-2.6-1.6-4.9-4.1-5.6 1.6-1 2.6-2.7 2.6-4.7A5.2 5.2 0 0 0 12 4z"/><path d="M9.5 9.8a1 1 0 1 0 2 0 1 1 0 1 0-2 0zM14.5 9.8a1 1 0 1 0 2 0 1 1 0 1 0-2 0z"/>',
+  // 蝙蝠
+  '<path d="M12 9c-2.5 0-4.5 2-4.5 4.5 0 1.6.9 3 2.2 3.8-.3 2.4-1 4.7-2.4 6.7 2.4-.9 4-2.8 4.7-5.2.7 2.4 2.3 4.3 4.7 5.2-1.4-2-2.1-4.3-2.4-6.7 1.3-.8 2.2-2.2 2.2-3.8C16.5 11 14.5 9 12 9z"/><path d="M9.5 8.5L9 5l2.2 2.4M14.5 8.5L15 5l-2.2 2.4M11 13a.8.8 0 1 0 1.6 0 .8.8 0 1 0-1.6 0zM14 13a.8.8 0 1 0 1.6 0 .8.8 0 1 0-1.6 0z"/>',
+  // 五角星
+  '<path d="M12 3.5l2.6 5.3 5.8.9-4.2 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.2-4.1 5.8-.9z"/>',
+  // 弯月
+  '<path d="M15 5a7 7 0 1 0 4.5 12.3A6 6 0 0 1 15 5z"/><path d="M13.6 4.2a1.4 1.4 0 1 0 2.8 0 1.4 1.4 0 1 0-2.8 0zM18.2 5.4a1.2 1.2 0 1 0 2.4 0 1.2 1.2 0 1 0-2.4 0z"/>',
+  // 蜘蛛网
+  '<path d="M12 2.5v4M12 17.5v4M2.5 12h4M17.5 12h4M5.3 5.3l2.8 2.8M15.9 15.9l2.8 2.8M18.7 5.3l-2.8 2.8M8.1 15.9l-2.8 2.8"/><path d="M7.5 12a4.5 4.5 0 0 1 4.5-4.5M7.5 12a4.5 4.5 0 0 0 4.5 4.5M10 12a2 2 0 1 0 4 0 2 2 0 1 0-4 0z"/>',
+  // 骷髅
+  '<path d="M12 6.5c-2.8 0-5 2.3-5 5.1 0 1.5.6 2.8 1.5 3.8-.2 2.9-1 5.6-2.3 7.6 2.6-1.1 4.3-3 5-5.4.7 2.4 2.4 4.3 5 5.4-1.3-2-2.1-4.7-2.3-7.6.9-1 1.5-2.3 1.5-3.8 0-2.8-2.2-5.1-5-5.1z"/><path d="M9.8 9.8a1.4 1.4 0 1 0 2.8 0 1.4 1.4 0 1 0-2.8 0zM14.8 9.8a1.4 1.4 0 1 0 2.8 0 1.4 1.4 0 1 0-2.8 0zM12 12.5l.9 1h-1.8z"/>',
+  // 蜘蛛
+  '<path d="M12 11a2.4 2.4 0 1 0 4.8 0 2.4 2.4 0 1 0-4.8 0zM12 16a1.8 1.8 0 1 0 3.6 0 1.8 1.8 0 1 0-3.6 0z"/><path d="M9 10.5c-2-.5-3.5.5-4.5 2M8.5 12.5c-2.2.6-3.8 2-4.8 4M9.6 14c-1.6 1.4-2.4 3.2-2.8 5.2M15 10.5c2-.5 3.5.5 4.5 2M15.5 12.5c2.2.6 3.8 2 4.8 4M14.4 14c1.6 1.4 2.4 3.2 2.8 5.2M12 5.5v3M12 20.5v-3"/>'
+];
+function decoDataUri(i, dark){
+  const col = dark ? 'rgba(255,179,71,.34)' : 'rgba(68,41,107,.36)';
+  const shape = DECO_SHAPES[(i * 7 + Math.floor(i / 8) * 3 + Math.floor(i / 16)) % DECO_SHAPES.length];
+  const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="' + col + '" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><g>' + shape + '</g></svg>';
+  return 'url("data:image/svg+xml,' + encodeURIComponent(svg) + '")';
+}
+
+/* 花园皮肤四季花纹：每季 2 种图案，按格确定性分布（棋子下方底纹） */
+const GARDEN_DECO = {
+  // 春：叶 + 花苞
+  spr: [
+    '<path d="M12 4C8 4 5.5 6.8 5.5 10.5c0 4.2 3.3 8.5 6.5 9.5 3.2-1 6.5-5.3 6.5-9.5C18.5 6.8 16 4 12 4z"/><path d="M12 4v16M12 8.5L8.8 6M12 12l3.2-2.2M12 15.5l-2.6 1.8"/>',
+    '<path d="M12 12a1.8 1.8 0 1 0 3.6 0 1.8 1.8 0 1 0-3.6 0z"/><path d="M12 5.5v4M12 14.5v4M5.5 12h4M14.5 12h4M7.5 7.5l2.8 2.8M13.7 13.7l2.8 2.8M16.5 7.5l-2.8 2.8M10.3 13.7l-2.8 2.8"/>'
+  ],
+  // 夏：玫瑰 + 六瓣花
+  sum: [
+    '<path d="M12 9a3 3 0 1 0 3 3 3 3 0 0 0-3-3z"/><path d="M12 11.4a.9.9 0 1 0 .9.9.9.9 0 0 0-.9-.9z"/><path d="M8.5 6C6.5 7.6 6.2 10.5 7.4 12.4M15.5 6c2 1.6 2.3 4.5 1.1 6.4"/>',
+    '<ellipse cx="12" cy="10.8" rx="2.3" ry="2.8"/><circle cx="12" cy="16.6" r="2.8"/><path d="M9.9 9.6l-2.9-1.5M9.7 11.6l-3.2.7M10.2 13.6l-2.7 2.1M10.8 15.8l-2.1 2.9M14.1 9.6l2.9-1.5M14.3 11.6l3.2.7M13.8 13.6l2.7 2.1M13.2 15.8l2.1 2.9"/><path d="M10.5 10.3a.55.55 0 1 0 1.1 0 .55.55 0 1 0-1.1 0zM12.8 10.3a.55.55 0 1 0 1.1 0 .55.55 0 1 0-1.1 0z"/>'
+  ],
+  // 秋：枫叶 + 橡果
+  aut: [
+    '<path d="M12 3.5l1.2 3.6 3.4-1.5-1.4 3.4 3.8.5-3.2 2.2 2.6 3.4-4-1.2L12 20.5l-2.2-6.6-4 1.2 2.6-3.4-3.2-2.2 3.8-.5-1.4-3.4 3.4 1.5z"/><path d="M12 3.5V20.5"/>',
+    '<path d="M4.5 19.5c3.8-5.6 7.8-9.2 13.5-10.8"/><path d="M7.5 16.2l-1.8-2.2M10 13.4l1.2-2.4M12.8 11.2l-.8-2.4M15.8 9.4l-1.6-1.8"/><path d="M18 8.7l1.6 1.2"/>'
+  ],
+  // 冬：雪花 + 松枝
+  win: [
+    '<path d="M12 3.5v17M5 8l14 8M19 8L5 16"/><path d="M12 6.5l1.5 1.5-1.5 1.5-1.5-1.5zM12 17.5l1.5-1.5-1.5-1.5-1.5 1.5zM8 12l1.5 1.5 1.5-1.5-1.5-1.5zM16 12l-1.5 1.5 1.5 1.5 1.5-1.5z"/>',
+    '<path d="M12 2.4l.8 1.5 1.7.2-1.2 1.2.3 1.7-1.6-.8-1.6.8.3-1.7-1.2-1.2 1.7-.2z"/><path d="M12 5l4 5H8z"/><path d="M12 9.5l4.6 5.6H7.4z"/><path d="M12 14.5l5.2 6.4H6.8z"/><path d="M12 21v1.8"/>'
+  ]
+};
+const GARDEN_DECO_COL = {
+  spr: { l: 'rgba(90,130,75,.34)', d: 'rgba(246,239,201,.38)' },
+  sum: { l: 'rgba(180,82,106,.34)', d: 'rgba(255,241,244,.42)' },
+  aut: { l: 'rgba(150,105,35,.34)', d: 'rgba(255,246,220,.42)' },
+  win: { l: 'rgba(150,165,180,.38)', d: 'rgba(255,255,255,.62)' }
+};
+function gardenDecoUri(season, i, dark){
+  const shapes = GARDEN_DECO[season];
+  const shape = shapes[(i * 7 + Math.floor(i / 8) * 3 + Math.floor(i / 16)) % shapes.length];
+  const col = dark ? GARDEN_DECO_COL[season].d : GARDEN_DECO_COL[season].l;
+  const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="' + col + '" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><g>' + shape + '</g></svg>';
+  return 'url("data:image/svg+xml,' + encodeURIComponent(svg) + '")';
+}
+/* ===================== 交互 UI ===================== */
+const $ = id => document.getElementById(id);
+const boardEl = $('board');
+const squares = [];
+const PIECE_NAME = { Q: '后', R: '车', B: '象', N: '马', P: '兵', K: '王' };
+const DIFF = {
+  easy: { time: 300, depth: 2 },
+  mid: { time: 900, depth: 3 },
+  hard: { time: 2500, depth: 4 }
+};
+
+for (let i = 0; i < 64; i++){
+  const d = document.createElement('div');
+  d.className = 'sq';
+  d.dataset.idx = i;
+  d.addEventListener('click', () => onSquareClick(i));
+  boardEl.appendChild(d);
+  squares.push(d);
+}
+
+const app = {
+  state: null,
+  keyCounts: null,
+  mode: 'ai',
+  diff: 'mid',
+  humanSide: 'w',
+  view: 'w',
+  skin: 'classic',
+  gardenLate: false,
+  selected: -1,
+  targets: [],
+  history: [],
+  over: false,
+  endType: null,
+  endReason: '',
+  aiThinking: false,
+  lastMove: null,
+  checkSq: -1,
+  hint: null,
+  hintTimer: null,
+  pendingPromo: null,
+  sound: true,
+  lang: 'zh'
+};
+
+/* ---- 国际化 ---- */
+const I18N = {
+  zh: {
+    title:'国际象棋', subtitle:'人机对弈 · 双人对弈 · 完整规则',
+    pickSkin:'选择皮肤', curSkin:'当前皮肤：',
+    skinClassic:'经典', skinHalloween:'万圣节', skinGarden:'花园与骑士',
+    startGame:'对局开始', evalTitle:'局面评估', boardAria:'棋盘',
+    opsTitle:'操作', undo:'悔棋', undoTitle:'撤销一步', newGameBtn:'新对局',
+    flipBtn:'翻转', flipTitle:'翻转棋盘', hintBtn:'提示', hintTitle:'让 AI 提示一步好棋',
+    soundOn:'音效：开', soundOff:'音效：关',
+    movesTitle:'走法记录', noMoves:'还没有走法',
+    settingsTitle:'对局设置', modeLabel:'模式', diffLabel:'难度', sideLabel:'我执',
+    modeAi:'人机对弈', modePvp:'双人对弈',
+    diffEasy:'简单', diffMid:'中等', diffHard:'困难',
+    sideW:'白（先手）', sideB:'黑（后手）',
+    promoTitle:'兵升变', promoDesc:'选择要升变成为的棋子',
+    pQ:'后', pR:'车', pB:'象', pN:'马', pP:'兵', pK:'王',
+    endTitle:'对局结束', whiteWonTitle:'白方获胜', blackWonTitle:'黑方获胜',
+    rematchBtn:'再来一局', viewBoardBtn:'查看棋盘',
+    whiteMove:'白方走棋', blackMove:'黑方走棋',
+    whiteChecked:'白方被将军', blackChecked:'黑方被将军',
+    whiteWin:'白方胜', blackWin:'黑方胜',
+    whiteWonBig:'白方获胜', blackWonBig:'黑方获胜',
+    draw:'和棋', checkmate:'将杀', gameOver:'对局结束', inProgress:'进行中',
+    check:'将军', checkExclaim:'将军！',
+    aiThinking:'AI 思考中', aiThinkingSub:'计算最佳应手…',
+    whiteCaptures:'白方吃子', blackCaptures:'黑方吃子',
+    draw50:'连续 50 回合未吃子也未进兵，按规则判和。',
+    drawRep:'同一局面出现三次，按规则判和。',
+    checkmateWin:'将杀获胜！', drawInsuff:'双方兵力不足以将杀，判和。',
+    drawStalemate:'无子可动，判和（逼和）。',
+    aiThinkingWait:'AI 思考中，稍等片刻', noUndo:'没有可撤销的走法', undone:'已悔棋',
+    newGameDone:'已开始新对局', aiTurnNow:'现在轮到 AI 走棋',
+    skinSwitched:'已切换为「{0}」皮肤',
+    langChanged:'已切换为中文', langChangedEn:'已切换为英文',
+    foot1:'经典棋子图形：Cburnett · ', foot2:'（Wikimedia Commons）；万圣节 / 花园与骑士皮肤棋子为原创卡通设计'
+  },
+  en: {
+    title:'Chess', subtitle:'AI · 2 Players · Full Rules',
+    pickSkin:'Pick skin', curSkin:'Current skin: ',
+    skinClassic:'Classic', skinHalloween:'Halloween', skinGarden:'Garden & Knights',
+    startGame:'Game on', evalTitle:'Position eval', boardAria:'Chess board',
+    opsTitle:'Actions', undo:'Undo', undoTitle:'Undo last move', newGameBtn:'New Game',
+    flipBtn:'Flip', flipTitle:'Flip board', hintBtn:'Hint', hintTitle:'Ask AI for a good move',
+    soundOn:'Sound: On', soundOff:'Sound: Off',
+    movesTitle:'Moves', noMoves:'No moves yet',
+    settingsTitle:'Settings', modeLabel:'Mode', diffLabel:'Level', sideLabel:'Play as',
+    modeAi:'vs AI', modePvp:'2 Players',
+    diffEasy:'Easy', diffMid:'Medium', diffHard:'Hard',
+    sideW:'White (1st)', sideB:'Black (2nd)',
+    promoTitle:'Promote', promoDesc:'Choose a piece to promote to',
+    pQ:'Q', pR:'R', pB:'B', pN:'N', pP:'P', pK:'K',
+    endTitle:'Game over', whiteWonTitle:'White wins', blackWonTitle:'Black wins',
+    rematchBtn:'Rematch', viewBoardBtn:'View board',
+    whiteMove:'White to move', blackMove:'Black to move',
+    whiteChecked:'White in check', blackChecked:'Black in check',
+    whiteWin:'White wins', blackWin:'Black wins',
+    whiteWonBig:'White won', blackWonBig:'Black won',
+    draw:'Draw', checkmate:'Checkmate', gameOver:'Game over', inProgress:'In progress',
+    check:'Check', checkExclaim:'Check!',
+    aiThinking:'AI thinking', aiThinkingSub:'Calculating best move…',
+    whiteCaptures:'White captured', blackCaptures:'Black captured',
+    draw50:'Draw by the 50-move rule (no capture or pawn move for 50 moves).',
+    drawRep:'Draw by threefold repetition.',
+    checkmateWin:'checkmates!', drawInsuff:'Draw: insufficient material.',
+    drawStalemate:'Draw: stalemate.',
+    aiThinkingWait:'AI is thinking, please wait', noUndo:'Nothing to undo', undone:'Move undone',
+    newGameDone:'New game started', aiTurnNow:"It's the AI's turn",
+    skinSwitched:'Switched to skin: {0}',
+    langChanged:'Switched to Chinese', langChangedEn:'Switched to English',
+    foot1:'Classic pieces: Cburnett · ', foot2:' (Wikimedia Commons); Halloween / Garden & Knights pieces: original cartoon design'
+  }
+};
+function t(key){
+  const d = I18N[app.lang] || I18N.zh;
+  let s = (d[key] !== undefined ? d[key] : I18N.zh[key]) || key;
+  for (let i = 1; i < arguments.length; i++) s = s.replace('{' + (i - 1) + '}', arguments[i]);
+  return s;
+}
+function skinKey(s){ return { classic: 'skinClassic', halloween: 'skinHalloween', garden: 'skinGarden' }[s]; }
+function endTitleText(){
+  if (!app.over) return t('endTitle');
+  return app.endType === 'checkmate'
+    ? t(app.winner === 'w' ? 'whiteWonTitle' : 'blackWonTitle')
+    : t('draw');
+}
+function applyLang(){
+  document.documentElement.lang = app.lang === 'en' ? 'en' : 'zh-CN';
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.getAttribute('data-i18n')); });
+  document.querySelectorAll('[data-i18n-title]').forEach(el => { el.title = t(el.getAttribute('data-i18n-title')); });
+  document.querySelectorAll('[data-i18n-aria]').forEach(el => { el.setAttribute('aria-label', t(el.getAttribute('data-i18n-aria'))); });
+  const lb = $('btnLang');
+  if (lb) lb.querySelectorAll('span[data-l]').forEach(sp => sp.classList.toggle('on', sp.dataset.l === app.lang));
+  $('skinLabel').textContent = t(skinKey(app.skin));
+  $('btnSound').textContent = app.sound ? t('soundOn') : t('soundOff');
+  updateStatus(); updateBadge(); renderCaptured(); renderMoves();
+  if (app.pendingPromo) showPromoRefill();
+  if ($('endModal').classList.contains('open') && app.endReason){
+    $('endTitle').textContent = endTitleText();
+    $('endDesc').textContent = app.endType === 'checkmate'
+      ? t(app.winner === 'w' ? 'whiteWonBig' : 'blackWonBig') + ' ' + t(app.endReason)
+      : t(app.endReason);
+  }
+}
+
+/* ---- 渲染 ---- */
+function pieceSvgStr(type, col){
+  let set = PIECE_SVG;
+  if (app.skin === 'halloween') set = HALLOWEEN_SVG;
+  else if (app.skin === 'garden') set = GARDEN_SVG;
+  return set[type + col];
+}
+function pieceHtml(p){
+  const type = p.toUpperCase();
+  const col = CHESS.isWhite(p) ? 'W' : 'B';
+  return '<span class="piece"><svg viewBox="0 0 45 45">' + pieceSvgStr(type, col) + '</svg></span>';
+}
+function render(){
+  if (app.skin === 'garden' && !app.gardenLate && app.state && CHESS.inCheck(app.state, app.state.turn)) app.gardenLate = true;
+  const s = app.state;
+  const view = app.view;
+  const leftFile = view === 'w' ? 0 : 7;
+  const bottomRank = view === 'w' ? 7 : 0;
+  for (let i = 0; i < 64; i++){
+    const di = view === 'w' ? i : 63 - i;
+    const el = squares[i];
+    const r = CHESS.rankOf(di), f = CHESS.fileOf(di);
+    const dark = (r + f) % 2 === 0;
+    let cls = 'sq ' + (dark ? 'd' : 'l');
+    let sn = '';
+    if (app.skin === 'garden'){
+      // 黑方半盘(di<32，上4行)=夏→冬(粉/白)，白方半盘(di>=32，下4行)=春→秋(绿/金)
+      sn = app.gardenLate ? (di < 32 ? 'win' : 'aut') : (di < 32 ? 'sum' : 'spr');
+      cls += ' g-' + sn + '-' + (dark ? 'd' : 'l');
+    }
+    el.className = cls;
+    if (app.skin === 'halloween') el.style.backgroundImage = decoDataUri(di, dark);
+    else if (app.skin === 'garden') el.style.backgroundImage = gardenDecoUri(sn, di, dark);
+    else el.style.backgroundImage = '';
+    const p = s.board[di];
+    let html = p ? pieceHtml(p) : '';
+    if (f === leftFile) html += '<span class="rank-label">' + (8 - r) + '</span>';
+    if (r === bottomRank) html += '<span class="file-label">' + FILES[f] + '</span>';
+    el.innerHTML = html;
+    if (app.lastMove && (app.lastMove.from === di || app.lastMove.to === di)) el.classList.add('last');
+    if (app.selected === di) el.classList.add('selected');
+    if (app.checkSq === di) el.classList.add('check');
+    if (app.hint && app.hint.from === di) el.classList.add('hint-f');
+    if (app.hint && app.hint.to === di) el.classList.add('hint-t');
+    if (app.targets.some(t => t.to === di)){
+      const cap = app.targets.some(t => t.to === di && (t.flags === 'c' || t.flags === 'ep' || t.flags === 'pc'));
+      el.classList.add(cap ? 'capture' : 'legal');
+    }
+  }
+}
+function updateStatus(){
+  const s = app.state;
+  $('turnDot').className = 'turn-dot ' + s.turn;
+  $('turnDot2').className = 'turn-dot ' + s.turn;
+  $('statusSub').textContent = '';
+  if (app.over){
+    if (app.endType === 'checkmate'){
+      $('statusText').textContent = t(app.winner === 'w' ? 'whiteWin' : 'blackWin');
+      $('bigStatus').textContent = t(app.winner === 'w' ? 'whiteWonBig' : 'blackWonBig');
+      $('statusTag').className = 'tag end';
+      $('statusTag').textContent = t('checkmate');
+    } else {
+      $('statusText').textContent = t('draw');
+      $('bigStatus').textContent = t('draw');
+      $('statusTag').className = 'tag warn';
+      $('statusTag').textContent = t('gameOver');
+    }
+    return;
+  }
+  if (app.aiThinking){
+    $('statusText').textContent = t('aiThinking');
+    $('statusSub').textContent = t('aiThinkingSub');
+    $('bigStatus').textContent = t('aiThinking');
+    $('statusTag').className = 'tag ok';
+    $('statusTag').textContent = t('inProgress');
+    return;
+  }
+  const sideKey = s.turn === 'w' ? 'white' : 'black';
+  const st = CHESS.gameStatus(s);
+  $('statusText').textContent = st.check ? t(sideKey + 'Checked') : t(sideKey + 'Move');
+  $('statusSub').textContent = st.check ? t('checkExclaim') : '';
+  $('bigStatus').textContent = t(sideKey + 'Move');
+  $('statusTag').className = st.check ? 'tag warn' : 'tag ok';
+  $('statusTag').textContent = st.check ? t('check') : t('inProgress');
+}
+function renderCaptured(){
+  const wCap = [], bCap = [];
+  for (const h of app.history){
+    if (h.undo.captured){
+      const cp = h.undo.captured;
+      (CHESS.isWhite(cp) ? bCap : wCap).push(cp);
+    }
+  }
+  const val = p => CHESS.MATERIAL[p.toUpperCase()];
+  wCap.sort((a, b) => val(b) - val(a));
+  bCap.sort((a, b) => val(b) - val(a));
+  const group = (title, arr) => {
+    let h = '<div class="cap-group"><span class="cap-title">' + title + '</span><span class="cap-icons">';
+    for (const p of arr) h += '<span class="mini"><svg viewBox="0 0 45 45">' + pieceSvgStr(p.toUpperCase(), CHESS.isWhite(p) ? 'W' : 'B') + '</svg></span>';
+    h += '</span></div>';
+    if (arr.length) h = h.replace('</span></div>', '<span class="cap-count">×' + arr.length + '</span></div>');
+    return h;
+  };
+  $('capturedRow').innerHTML = group(t('whiteCaptures'), wCap) + group(t('blackCaptures'), bCap);
+}
+function renderMoves(){
+  const list = $('movesList');
+  if (!app.history.length){
+    list.innerHTML = '<div class="empty-moves">' + t('noMoves') + '</div>';
+    return;
+  }
+  let h = '<ol>';
+  for (let i = 0; i < app.history.length; i += 2){
+    const no = Math.floor(i / 2) + 1;
+    const w = app.history[i].san;
+    const b = app.history[i + 1] ? app.history[i + 1].san : '';
+    h += '<li class="' + (i === app.history.length - 1 ? 'cur' : '') + '"><span class="no">' + no + '.</span><span class="m">' + w + '</span>' + (b ? '<span class="m">' + b + '</span>' : '<span class="pl"></span>') + '</li>';
+  }
+  list.innerHTML = h + '</ol>';
+  list.scrollTop = list.scrollHeight;
+}
+function renderEval(){
+  const score = CHESS.evaluate(app.state);
+  const whiteScore = app.state.turn === 'w' ? score : -score;
+  const pct = Math.max(0, Math.min(100, 50 + whiteScore / 1800 * 50));
+  $('evalFill').style.height = pct + '%';
+}
+function updateBadge(){
+  const modeTxt = t(app.mode === 'ai' ? 'modeAi' : 'modePvp');
+  const diffTxt = t({ easy: 'diffEasy', mid: 'diffMid', hard: 'diffHard' }[app.diff]);
+  $('modeBadge').textContent = app.mode === 'ai' ? (modeTxt + ' · ' + diffTxt) : modeTxt;
+}
+
+/* ---- SAN 记谱 ---- */
+function sanFor(mv, beforeState){
+  const s = beforeState;
+  const piece = s.board[mv.from];
+  const t = piece.toUpperCase();
+  const dest = CHESS.sqName(mv.to);
+  const undo = CHESS.makeMove(s, mv);
+  const st = CHESS.gameStatus(s);
+  CHESS.unmakeMove(s, mv, undo);
+  const suffix = st.over && st.type === 'checkmate' ? '#' : (st.check ? '+' : '');
+  if (mv.flags === 'k') return 'O-O' + suffix;
+  if (mv.flags === 'q') return 'O-O-O' + suffix;
+  if (t === 'P'){
+    if (mv.flags === 'c' || mv.flags === 'pc' || mv.flags === 'ep'){
+      return FILES[CHESS.fileOf(mv.from)] + 'x' + dest + (mv.promo ? '=' + mv.promo : '') + suffix;
+    }
+    return dest + (mv.promo ? '=' + mv.promo : '') + suffix;
+  }
+  const others = CHESS.generateLegalMoves(s).filter(m =>
+    m.from !== mv.from && s.board[m.from] === piece && m.to === mv.to
+  );
+  let dis = '';
+  if (others.length){
+    const myFile = CHESS.fileOf(mv.from), myRank = CHESS.rankOf(mv.from);
+    if (!others.some(m => CHESS.fileOf(m.from) === myFile)) dis = FILES[myFile];
+    else if (!others.some(m => CHESS.rankOf(m.from) === myRank)) dis = String(8 - myRank);
+    else dis = FILES[myFile] + (8 - myRank);
+  }
+  const cap = (mv.flags === 'c' || mv.flags === 'pc') ? 'x' : '';
+  return t + dis + cap + dest + suffix;
+}
+
+/* ---- 音效 ---- */
+let audioCtx = null;
+function beep(freq, dur, type, vol){
+  if (!app.sound) return;
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type = type || 'triangle';
+    o.frequency.value = freq;
+    g.gain.setValueAtTime(vol || 0.07, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime + dur);
+  } catch (e) { /* 音频不可用时静默 */ }
+}
+function sndMove(capture){
+  if (capture){ beep(300, 0.12, 'triangle'); beep(220, 0.10, 'triangle', 0.05); }
+  else beep(440, 0.08, 'triangle');
+}
+function sndCheck(){ beep(880, 0.12, 'sine', 0.05); }
+function sndEnd(){
+  beep(523, 0.16, 'triangle');
+  setTimeout(() => beep(659, 0.16, 'triangle'), 130);
+  setTimeout(() => beep(784, 0.28, 'triangle'), 260);
+}
+
+/* ---- Toast ---- */
+let toastTimer = null;
+function toast(msg){
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* ---- 对局流程 ---- */
+function playMove(mv){
+  const before = CHESS.stateToFen(app.state);
+  const undo = CHESS.makeMove(app.state, mv);
+  const san = sanFor(mv, CHESS.fenToState(before));
+  const postKey = CHESS.posKey(app.state);
+  app.history.push({ mv, undo, san, postKey });
+  app.keyCounts.set(postKey, (app.keyCounts.get(postKey) || 0) + 1);
+  app.lastMove = { from: mv.from, to: mv.to };
+  app.selected = -1; app.targets = []; app.hint = null;
+  app.checkSq = -1;
+  sndMove(!!undo.captured);
+  render(); updateStatus(); renderCaptured(); renderMoves(); renderEval();
+  // 判和：五十步 / 三次重复
+  if (app.state.halfmove >= 100){ endGame('draw', 'draw50', null); return; }
+  if ((app.keyCounts.get(CHESS.posKey(app.state)) || 0) >= 3){ endGame('draw', 'drawRep', null); return; }
+  const st = CHESS.gameStatus(app.state);
+  if (st.over){
+    if (st.type === 'checkmate'){
+      endGame('checkmate', 'checkmateWin', st.winner);
+    } else {
+      endGame('draw', st.reason === 'insufficient' ? 'drawInsuff' : 'drawStalemate', null);
+    }
+    return;
+  }
+  if (st.check){ sndCheck(); app.checkSq = CHESS.findKing(app.state, app.state.turn); render(); }
+  if (app.mode === 'ai' && app.state.turn !== app.humanSide) aiTurn();
+}
+function endGame(type, reason, winner){
+  app.over = true; app.endType = type; app.endReason = reason; app.winner = winner;
+  app.selected = -1; app.targets = [];
+  render(); updateStatus();
+  sndEnd();
+  $('endTitle').textContent = endTitleText();
+  $('endDesc').textContent = type === 'checkmate'
+    ? t(winner === 'w' ? 'whiteWonBig' : 'blackWonBig') + ' ' + t(reason)
+    : t(reason);
+  $('endModal').classList.add('open');
+}
+function aiTurn(){
+  app.aiThinking = true;
+  updateStatus(); render();
+  const cfg = DIFF[app.diff];
+  setTimeout(() => {
+    const mv = CHESS.findBestMove(app.state, cfg.time, cfg.depth);
+    app.aiThinking = false;
+    if (mv) playMove(mv);
+  }, 40);
+}
+
+/* ---- 交互 ---- */
+function onSquareClick(i){
+  const s = app.state;
+  if (app.over || app.aiThinking || app.pendingPromo) return;
+  if (app.mode === 'ai' && s.turn !== app.humanSide) return;
+  if (app.selected >= 0 && app.selected === i){
+    app.selected = -1; app.targets = []; render(); return;
+  }
+  if (app.selected >= 0){
+    const tgt = app.targets.find(t => t.to === i);
+    if (tgt){
+      if (tgt.flags === 'p' || tgt.flags === 'pc') showPromo(tgt);
+      else playMove(tgt);
+      return;
+    }
+  }
+  const p = s.board[i];
+  if (p && CHESS.pieceColor(p) === s.turn){
+    app.selected = i;
+    app.targets = CHESS.generateLegalMoves(s).filter(m => m.from === i);
+    render();
+  } else {
+    app.selected = -1; app.targets = []; render();
+  }
+}
+function showPromo(mv){
+  app.pendingPromo = mv;
+  const col = app.state.turn === 'w' ? 'W' : 'B';
+  const grid = $('promoGrid');
+  grid.innerHTML = '';
+  for (const t of ['Q', 'R', 'B', 'N']){
+    const b = document.createElement('button');
+    b.className = 'promo-btn';
+    b.innerHTML = '<svg viewBox="0 0 45 45">' + pieceSvgStr(t, col) + '</svg><span>' + t('p' + t) + '</span>';
+    b.addEventListener('click', () => {
+      $('promoModal').classList.remove('open');
+      app.pendingPromo = null;
+      playMove({ from: mv.from, to: mv.to, flags: mv.flags, promo: t });
+    });
+    grid.appendChild(b);
+  }
+  $('promoModal').classList.add('open');
+}
+function undoMove(){
+  if (app.aiThinking){ toast(t('aiThinkingWait')); return; }
+  if (!app.history.length){ toast(t('noUndo')); return; }
+  let n = app.mode === 'ai' ? 2 : 1;
+  if (app.history.length < n) n = app.history.length;
+  for (let k = 0; k < n; k++){
+    const h = app.history.pop();
+    CHESS.unmakeMove(app.state, h.mv, h.undo);
+    app.keyCounts.set(h.postKey, (app.keyCounts.get(h.postKey) || 1) - 1);
+  }
+  app.over = false; app.endType = null; app.endReason = ''; app.winner = null;
+  $('endModal').classList.remove('open');
+  app.selected = -1; app.targets = []; app.hint = null; app.checkSq = -1;
+  app.lastMove = app.history.length ? { from: app.history[app.history.length - 1].mv.from, to: app.history[app.history.length - 1].mv.to } : null;
+  const st = CHESS.gameStatus(app.state);
+  if (st.check) app.checkSq = CHESS.findKing(app.state, app.state.turn);
+  render(); updateStatus(); renderCaptured(); renderMoves(); renderEval();
+  toast(t('undone'));
+}
+function newGame(){
+  $('endModal').classList.remove('open');
+  $('promoModal').classList.remove('open');
+  app.pendingPromo = null;
+  app.state = CHESS.fenToState(CHESS.START_FEN);
+  app.keyCounts = new Map();
+  app.keyCounts.set(CHESS.posKey(app.state), 1);
+  app.history = [];
+  app.over = false; app.endType = null; app.endReason = ''; app.winner = null;
+  app.selected = -1; app.targets = []; app.hint = null; app.lastMove = null;
+  app.checkSq = -1; app.aiThinking = false; app.gardenLate = false;
+  render(); updateStatus(); renderCaptured(); renderMoves(); renderEval();
+  if (app.mode === 'ai' && app.humanSide === 'b') aiTurn();
+}
+function doHint(){
+  if (app.over || app.aiThinking) return;
+  if (app.mode === 'ai' && app.state.turn !== app.humanSide){ toast(t('aiTurnNow')); return; }
+  const mv = CHESS.findBestMove(app.state, 500, 2);
+  if (!mv) return;
+  app.hint = { from: mv.from, to: mv.to };
+  render();
+  clearTimeout(app.hintTimer);
+  app.hintTimer = setTimeout(() => { app.hint = null; render(); }, 2400);
+}
+
+/* ---- 设置 ---- */
+function setMode(mode){
+  app.mode = mode;
+  $('fieldSide').style.display = mode === 'ai' ? '' : 'none';
+  $('segMode').querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+  updateBadge();
+  newGame();
+}
+function setDiff(diff){
+  app.diff = diff;
+  $('segDiff').querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.diff === diff));
+  updateBadge();
+}
+function setSide(side){
+  app.humanSide = side;
+  $('segSide').querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.side === side));
+  updateBadge();
+  newGame();
+}
+
+$('segMode').querySelectorAll('button').forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode)));
+$('segDiff').querySelectorAll('button').forEach(b => b.addEventListener('click', () => setDiff(b.dataset.diff)));
+$('segSide').querySelectorAll('button').forEach(b => b.addEventListener('click', () => setSide(b.dataset.side)));
+$('btnUndo').addEventListener('click', undoMove);
+$('btnNew').addEventListener('click', () => { newGame(); toast(t('newGameDone')); });
+$('btnFlip').addEventListener('click', () => { app.view = app.view === 'w' ? 'b' : 'w'; render(); });
+$('btnHint').addEventListener('click', doHint);
+$('btnSound').addEventListener('click', () => {
+  app.sound = !app.sound;
+  $('btnSound').textContent = app.sound ? t('soundOn') : t('soundOff');
+});
+$('btnRematch').addEventListener('click', newGame);
+$('btnCloseEnd').addEventListener('click', () => $('endModal').classList.remove('open'));
+$('promoModal').addEventListener('click', e => {
+  if (e.target === $('promoModal')){
+    $('promoModal').classList.remove('open');
+    app.pendingPromo = null;
+    app.selected = -1; app.targets = []; render();
+  }
+});
+
+/* ---- 皮肤 ---- */
+const SKIN_META = { classic: '经典', halloween: '万圣节', garden: '花园与骑士' };
+function showPromoRefill(){
+  if (!app.pendingPromo) return;
+  const col = CHESS.isWhite(app.pendingPromo.piece) ? 'W' : 'B';
+  $('promoGrid').querySelectorAll('button').forEach((b, i) => {
+    const t = ['Q', 'R', 'B', 'N'][i];
+    b.innerHTML = '<svg viewBox="0 0 45 45">' + pieceSvgStr(t, col) + '</svg><span>' + t('p' + t) + '</span>';
+  });
+}
+function applySkin(s){
+  app.skin = s;
+  document.body.classList.remove('halloween', 'garden');
+  if (s === 'halloween') document.body.classList.add('halloween');
+  if (s === 'garden') document.body.classList.add('garden');
+  $('skinLabel').textContent = t(skinKey(s));
+  $('btnSkin').title = t('curSkin') + t(skinKey(s));
+  $('skinMenu').querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.skin === s));
+  try { localStorage.setItem('chess-skin', s); } catch (e) {}
+  render(); renderCaptured(); showPromoRefill();
+}
+$('btnSkin').addEventListener('click', e => {
+  e.stopPropagation();
+  $('skinMenu').classList.toggle('open');
+});
+$('skinMenu').querySelectorAll('button').forEach(b => b.addEventListener('click', e => {
+  e.stopPropagation();
+  const s = b.dataset.skin;
+  if (s !== app.skin) toast(t('skinSwitched', t(skinKey(s))));
+  $('skinMenu').classList.remove('open');
+  applySkin(s);
+}));
+document.addEventListener('click', () => $('skinMenu').classList.remove('open'));
+
+/* ---- 语言 ---- */
+$('btnLang').addEventListener('click', () => {
+  app.lang = app.lang === 'zh' ? 'en' : 'zh';
+  try { localStorage.setItem('chess-lang', app.lang); } catch (e) {}
+  applyLang();
+  toast(t(app.lang === 'zh' ? 'langChanged' : 'langChangedEn'));
+});
+
+/* ---- 启动 ---- */
+newGame();
+(function initSkin(){
+  let init = 'classic';
+  try {
+    const q = new URLSearchParams(location.search).get('skin');
+    if (SKIN_META[q]) init = q;
+  } catch (e) {}
+  if (init === 'classic'){
+    try {
+      const saved = localStorage.getItem('chess-skin');
+      if (SKIN_META[saved]) init = saved;
+    } catch (e) {}
+  }
+  applySkin(init);
+})();
+(function initLang(){
+  let l = 'zh';
+  try {
+    const q = new URLSearchParams(location.search).get('lang');
+    if (q === 'zh' || q === 'en') l = q;
+  } catch (e) {}
+  if (l === 'zh'){
+    try {
+      const saved = localStorage.getItem('chess-lang');
+      if (saved === 'en') l = 'en';
+    } catch (e) {}
+  }
+  app.lang = l;
+  applyLang();
+})();
+</script>
+</body>
+</html>
